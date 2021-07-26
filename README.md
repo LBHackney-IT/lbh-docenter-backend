@@ -1,15 +1,11 @@
-# LBH Base API
+# Documentation Centralization API
 
-Base API is a boilerplate code for being reused for new APIs for LBH
+Documentation Centralization API is intended to be used by CirlceCI pipelines of other APIs to store their documentation schemas, as well as by a front-end application that will display the stored api-generated and user-written documentation.
 
 ## Stack
 
 - .NET Core as a web framework.
 - nUnit as a test framework.
-
-## Dependencies
-
-- Universal Housing Simulator
 
 ## Contributing
 
@@ -20,42 +16,6 @@ Base API is a boilerplate code for being reused for new APIs for LBH
 3. Clone this repository.
 4. Rename the initial template.
 5. Open it in your IDE.
-
-### Renaming
-
-The renaming of `docenter-api` into `SomethingElseApi` can be done by running a Renamer powershell script. To do so:
-1. Open the powershell and navigate to this directory's root.
-2. Run the script using the following command:
-```
-.\Renamer.ps1 -apiName My_Api
-```
-
-If your ***script execution policy*** prevents you from running the script, you can temporarily ***bypass*** that with:
-```
-powershell -noprofile -ExecutionPolicy Bypass -file .\Renamer.ps1 -apiName My_Api
-```
-
-Or you can change your execution policy, prior to running the script, permanently with _(this disables security so, be cautious)_:
-```
-Set-ExecutionPolicy Unrestricted
-```
-
-After the renaming is done, the ***script will ask you if you want to delete it as well***, as it's useless now - It's your choice.
-
-#### On OSX
-
-Use Docker to run this script on Macs:
-```
-docker run -it -v `pwd`:/app mcr.microsoft.com/powershell
-```
-
-#### On *nix
-
-Run the renamer.sh bash script from the project root:
-```
-./rename.sh MyApiName
-```
-Ideally you should provide a script argument in PascalCase as in the example. The script will rename all instances of base api without changing the original casing.
 
 ### Development
 
@@ -164,13 +124,7 @@ If changes to the database schema are made then the docker image for the databas
 
 ### Active Maintainers
 
-- **Selwyn Preston**, Lead Developer at London Borough of Hackney (selwyn.preston@hackney.gov.uk)
-- **Mirela Georgieva**, Lead Developer at London Borough of Hackney (mirela.georgieva@hackney.gov.uk)
-- **Matt Keyworth**, Lead Developer at London Borough of Hackney (matthew.keyworth@hackney.gov.uk)
-
-### Other Contacts
-
-- **Rashmi Shetty**, Product Owner at London Borough of Hackney (rashmi.shetty@hackney.gov.uk)
+- **Liudvikas Taluntis**, Digital Development at London Borough of Hackney (liudvikas.taluntis@hackney.gov.uk)
 
 [docker-download]: https://www.docker.com/products/docker-desktop
 [universal-housing-simulator]: https://github.com/LBHackney-IT/lbh-universal-housing-simulator
