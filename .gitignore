@@ -2,6 +2,11 @@
 *.DS_Store
 [Tt]humbs.db
 
+#Visual Studio Code Files
+.vscode/
+DocenterApi.Tests/.vscode/
+DocenterApi/.vscode/
+
 #Visual Studio Files
 [Oo]bj
 [Bb]in
@@ -59,7 +64,7 @@ bin/
 .idea/
 tmp/
 .vs/
-/base-api.Tests/Properties/launchSettings.json
+/docenter-api.Tests/Properties/launchSettings.json
 
 .fake
 .ionide
