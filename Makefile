@@ -16,7 +16,7 @@ shell:
 
 .PHONY: test
 test:
-	docker-compose up test-database & docker-compose build docenter-api-test && docker-compose up docenter-api-test
+	docker-compose up dynamodb-database & docker-compose build docenter-api-test && docker-compose up docenter-api-test
 
 .PHONY: lint
 lint:

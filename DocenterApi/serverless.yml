@@ -13,7 +13,7 @@ provider:
   region: eu-west-2
   apiKeys:
     - secureAccess:
-      - api-key-${self:service}-${self:provider.stage}
+        - api-key-${self:service}-${self:provider.stage}
   usagePlan:
     - secureAccess:
         throttle:
@@ -21,7 +21,7 @@ provider:
           rateLimit: 100
 
 package:
-# TODO: Rename zipfile in build.sh and build.cmd to match this
+  # TODO: Rename zipfile in build.sh and build.cmd to match this
   artifact: ./bin/release/netcoreapp3.1/your-api-name.zip
 
 functions:
@@ -29,10 +29,6 @@ functions:
     name: ${self:service}-${self:provider.stage}
     handler: DocenterApi::DocenterApi.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
-    environment:
-# TODO: Create ssm variables for this API's postgres mirror then rename docenter-api below to match api name
-# TODO: Remove this line if DynamoDb is being used
-      CONNECTION_STRING: Host=${ssm:/docenter-api/${self:provider.stage}/postgres-hostname};Port=${ssm:/docenter-api/${self:provider.stage}/postgres-port};Database=docenter-api-mirror;Username=${ssm:/docenter-api/${self:provider.stage}/postgres-username};Password=${ssm:/docenter-api/${self:provider.stage}/postgres-password}
     events:
       - http:
           path: /{proxy+}
@@ -50,7 +46,7 @@ resources:
         Path: /${self:service}/${self:provider.stage}/
         RoleName: ${self:service}-lambdaExecutionRole
         AssumeRolePolicyDocument:
-          Version: '2012-10-17'
+          Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Principal:
@@ -60,12 +56,12 @@ resources:
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
           - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
-# TODO: Enable this line and set the correct policy name if DynamoDb is in use
-#          - arn:aws:iam::${self:provider.account}:policy/docenter-api/lambda-dynamodb-docenter-api
+        # TODO: Enable this line and set the correct policy name if DynamoDb is in use
+        #          - arn:aws:iam::${self:provider.account}:policy/docenter-api/lambda-dynamodb-docenter-api
         Policies:
           - PolicyName: manageLogs
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
@@ -73,12 +69,12 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                   Resource:
-                    - 'Fn::Join':
-                        - ':'
-                        - - 'arn:aws:logs'
-                          - Ref: 'AWS::Region'
-                          - Ref: 'AWS::AccountId'
-                          - 'log-group:/aws/lambda/*:*:*'
+                    - "Fn::Join":
+                        - ":"
+                        - - "arn:aws:logs"
+                          - Ref: "AWS::Region"
+                          - Ref: "AWS::AccountId"
+                          - "log-group:/aws/lambda/*:*:*"
                 - Effect: "Allow"
                   Action:
                     - "s3:PutObject"
@@ -90,7 +86,7 @@ resources:
                         - "Ref": "ServerlessDeploymentBucket"
           - PolicyName: lambdaInvocation
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
