@@ -21,6 +21,7 @@ module.exports = {
       payload = JSON.parse(event.body);
     } catch (jsonError) {
       console.log("There was an error parsing json body:\n", jsonError);
+      console.log(event.body);
       return {
         statusCode: 400,
       };
@@ -41,6 +42,7 @@ module.exports = {
       TableName: process.env.DYNAMODB_APIS_TABLE,
       // should do parsing elsewhere
       Item: {
+        id: payload.id,
         name: payload.name,
         baseUrl: payload.baseUrl,
       },
