@@ -40,8 +40,19 @@ module.exports = {
       statusCode: 501,
     };
   },
-  createAPI: async (event, context) => {},
-  listAPIs: async (event, context) => {},
-  getAPI: async (event, context) => {},
-  patchAPI: async (event, context) => {},
+  listAPIs: async (event, context) => {
+    return {
+      statusCode: 501,
+    };
+  },
+  getAPI: async (event, context) => {
+    return {
+      statusCode: 501,
+    };
+  },
+  patchAPI: async (event, context) => {
+    return {
+      statusCode: 501,
+    };
+  },
 };
