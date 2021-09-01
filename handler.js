@@ -46,10 +46,9 @@ module.exports = {
       },
     };
 
-    let putResult = {};
     try {
       let dynamodb = new AWS.DynamoDB.DocumentClient();
-      putResult = await dynamodb.put(createParams).promise();
+      await dynamodb.put(createParams).promise();
     } catch (createError) {
       console.log("There was a problem creating an API record.\n", createError);
       console.log("Create parameters: ", createParams);
@@ -69,8 +68,39 @@ module.exports = {
     };
   },
   getAPI: async (event, context) => {
+    let getParams = {
+      TableName: process.env.DYNAMODB_APIS_TABLE,
+      Key: {
+        id: event.pathParameters.id,
+      },
+    };
+
+    let getResult = {};
+    try {
+      let dynamodb = new AWS.DynamoDB.DocumentClient();
+      getResult = await dynamodb.get(getParams).promise();
+    } catch (getError) {
+      console.log("There was a problem creating an API record.\n", getError);
+      console.log("Create parameters: ", getParams);
+      return {
+        statusCode: 500,
+        message: getError,
+      };
+    }
+
+    if (getResult.Item === null) {
+      return {
+        statusCode: 404,
+      };
+    }
+
     return {
-      statusCode: 501,
+      statusCode: 200,
+      // do custom mapping here
+      body: JSON.stringify({
+        name: getResult.Item.name,
+        baseUrl: getResult.Item.baseUrl,
+      }),
     };
   },
   patchAPI: async (event, context) => {
