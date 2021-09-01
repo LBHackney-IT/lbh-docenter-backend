@@ -57,6 +57,8 @@ environment:
 #    - include-me.js
 #    - include-me-dir/**
 
+plugins:
+  - serverless-pseudo-parameters
 functions:
   hello:
     handler: handler.hello

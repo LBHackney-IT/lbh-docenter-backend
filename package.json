@@ -9,5 +9,8 @@
   "private": false,
   "dependencies": {
     "aws-sdk": "^2.980.0"
+  },
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.6.0"
   }
 }
