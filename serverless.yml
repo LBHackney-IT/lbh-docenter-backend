@@ -18,7 +18,7 @@ service: lbh-docenter-backend
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 provider:
   name: aws
@@ -60,6 +60,34 @@ provider:
 functions:
   hello:
     handler: handler.hello
+    events:
+      - http:
+          path: /v1/hello
+          method: get
+  createAPI:
+    handler: handler.createAPI
+    events:
+      - http:
+          path: /v1/apis
+          method: post
+  listAPIs:
+    handler: handler.listAPIs
+    events:
+      - http:
+          path: /v1/apis
+          method: get
+  getAPI:
+    handler: handler.getAPI
+    events:
+      - http:
+          path: /v1/apis/{id}
+          method: get
+  patchAPI:
+    handler: handler.patchAPI
+    events:
+      - http:
+          path: /v1/apis/{id}
+          method: patch
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
