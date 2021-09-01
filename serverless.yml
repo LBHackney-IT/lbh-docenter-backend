@@ -27,7 +27,7 @@ provider:
 
   # you can overwrite defaults here
   #  stage: dev
-  #  region: us-east-1
+  # f: eu-west-2
 
   # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
@@ -38,7 +38,7 @@ provider:
         - dynamodb:GetIem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: arn:aws:dynamo:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis-${opt:stage}
+      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis-${opt:stage}
   #        - "s3:ListBucket"
   #      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
   #    - Effect: "Allow"
