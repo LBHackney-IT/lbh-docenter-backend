@@ -37,8 +37,30 @@ module.exports = {
       };
     }
 
+    let createParams = {
+      TableName: process.env.DYNAMODB_APIS_TABLE,
+      // should do parsing elsewhere
+      Item: {
+        name: payload.name,
+        baseUrl: payload.baseUrl,
+      },
+    };
+
+    let putResult = {};
+    try {
+      let dynamodb = new AWS.DynamoDB.DocumentClient();
+      putResult = await dynamodb.put(createParams).promise();
+    } catch (createError) {
+      console.log("There was a problem creating an API record.\n", createError);
+      console.log("Create parameters: ", createParams);
+      return {
+        statusCode: 500,
+        message: createError,
+      };
+    }
+
     return {
-      statusCode: 501,
+      statusCode: 201,
     };
   },
   listAPIs: async (event, context) => {
