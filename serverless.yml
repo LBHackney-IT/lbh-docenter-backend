@@ -46,8 +46,8 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+environment:
+  DYNAMODB_APIS_TABLE: ${self:service}-apis-${opt:stage}
 
 # you can add packaging information here
 #package:
@@ -129,8 +129,19 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
+resources:
+  Resources:
+    apisTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${self:service}-apis-${opt:stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
 #    NewResource:
 #      Type: AWS::S3::Bucket
 #      Properties:
