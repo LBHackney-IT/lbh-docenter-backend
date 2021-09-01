@@ -1,0 +1,10 @@
+{
+  "name": "lbh-docenter-backend",
+  "version": "1.0.0",
+  "description": "A back-end for storing and updating the documentation related information of various project repositories",
+  "main": "handler.js",
+  "repository": "https://github.com/LBHackney-IT/lbh-docenter-backend.git",
+  "author": "duslerke <liudvikast@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
