@@ -1,10 +1,12 @@
 class APIRecordUseCase {
-  constructor(apiRecordGateway) {
+  constructor(apiRecordGateway, domainDataMapper) {
     this._apiRecordGateway = apiRecordGateway;
+    this._domainDataMapper = domainDataMapper;
   }
 
-  async executePost() {
-    return await this._apiRecordGateway.executePost();
+  async executePost(domainBoundary) {
+    const dataBoundary = this._domainDataMapper.domainToData(domainBoundary);
+    await this._apiRecordGateway.executePost(dataBoundary);
   }
 }
 
