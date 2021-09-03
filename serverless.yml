@@ -65,6 +65,7 @@ provider:
 
 plugins:
   - serverless-pseudo-parameters
+  - serverless-offline
 functions:
   hello:
     handler: api-records-controller.hello
