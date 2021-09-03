@@ -2,7 +2,7 @@
   "name": "lbh-docenter-backend",
   "version": "1.0.0",
   "description": "A back-end for storing and updating the documentation related information of various project repositories",
-  "main": "handler.js",
+  "main": "api-records-controller.js",
   "scripts": {
     "unit": "jest"
   },
