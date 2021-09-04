@@ -4,7 +4,7 @@
   "description": "A back-end for storing and updating the documentation related information of various project repositories",
   "main": "api-records-controller.js",
   "scripts": {
-    "unit": "jest"
+    "unit": "eval \"$(cat .env.unit | tr '\n' ' ') jest \"\\.unit\\.test\\.js\"\""
   },
   "repository": "https://github.com/LBHackney-IT/lbh-docenter-backend.git",
   "author": "duslerke <liudvikast@gmail.com>",
