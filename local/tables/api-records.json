@@ -1,5 +1,5 @@
 {
-  "TableName": "docenter-backend-apis-local",
+  "TableName": "api-records",
   "KeySchema": [
     {
       "AttributeName": "id",
