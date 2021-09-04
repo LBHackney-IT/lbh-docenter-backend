@@ -56,7 +56,7 @@ module.exports = {
     };
 
     try {
-      let dynamodb = new AWS.DynamoDB.DocumentClient();
+      let dynamodb = new AWS.DynamoDB.DocumentClient(options);
       await dynamodb.put(createParams).promise();
     } catch (createError) {
       console.log("There was a problem creating an API record.\n", createError);
@@ -86,7 +86,7 @@ module.exports = {
 
     let getResult = {};
     try {
-      let dynamodb = new AWS.DynamoDB.DocumentClient();
+      let dynamodb = new AWS.DynamoDB.DocumentClient(options);
       getResult = await dynamodb.get(getParams).promise();
     } catch (getError) {
       console.log("There was a problem creating an API record.\n", getError);
