@@ -16,6 +16,7 @@
   "devDependencies": {
     "faker": "^5.5.3",
     "jest": "^27.1.0",
+    "randexp": "^0.5.3",
     "serverless-offline": "^8.0.0",
     "serverless-pseudo-parameters": "^2.6.0"
   }
