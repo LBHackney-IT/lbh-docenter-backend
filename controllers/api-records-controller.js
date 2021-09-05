@@ -14,6 +14,15 @@ class APIRecordsController {
         ?.filter(
           (rule) => !rule.validate({ ...event.pathParameters, ...event.body })
         )
+        .map((rule) => rule.failureMessage);
+
+      if (validationErrors?.length > 0)
+        return {
+          statusCode: 400,
+          body: {
+            validationErrors,
+          },
+        };
 
       try {
         return await implementation(event, context);

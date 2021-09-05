@@ -165,6 +165,38 @@ describe("API Records Controller", () => {
       // assert
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
-    // test that returns 400 upon validation errors
+
+    it("should return a function that returns validators' returned validation errors in a custom 400 bad input response", async () => {
+      // arrange
+      const event = { pathParameters: "", body: "" };
+      const context = {};
+
+      const mockValidators = [...new Array(3).keys()].map((num) => {
+        return {
+          failureMessage: _faker.random.words(3),
+          validate: jest.fn().mockReturnValue(num % 2 !== 0),
+        };
+      });
+
+      const expectedResponse = {
+        statusCode: 400,
+        body: {
+          validationErrors: mockValidators
+            .filter((_, i) => i % 2 === 0)
+            .map((v) => v.failureMessage),
+        },
+      };
+
+      const endpoint = classUnderTest.baseEndpoint({
+        validators: mockValidators,
+        implementation: () => {},
+      });
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
   });
 });
