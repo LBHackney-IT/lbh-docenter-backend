@@ -199,4 +199,63 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
   });
+
+  describe("Create method", () => {
+    // TODO: don't test all of them at once!
+    it("should return a function that performs validation on user input to check whether the required fields are non-empty", async () => {
+      // arrange
+      const event = {};
+      const context = {};
+
+      const expectedResponse = {
+        statusCode: 400,
+        body: {
+          validationErrors: [
+            "Please provide a non-empty API name.",
+            "Please provide a non-empy GithubId number.",
+            "Please provide a valid and non-empty API's url base.",
+            "Please provide a valid and non-empty Github url.",
+          ],
+        },
+      };
+
+      const endpoint = classUnderTest.create();
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+});
+
+    it("should return a function that performs validation checking whether GithubId is a number", async () => {
+      // arrange
+      const event = {
+        body: {
+          name: _faker.random.word(3),
+          githubId: _faker.datatype.number(10 ** 9, 10 ** 10 - 1).toString(),
+          baseUrl: {
+            [randexp(/development|staging|production/)]: _faker.internet.url(),
+          },
+          githubUrl: _faker.internet.url(),
+        },
+      };
+      const context = {};
+
+      const expectedResponse = {
+        statusCode: 400,
+        body: {
+          validationErrors: ["Please provide a non-empy GithubId number."],
+        },
+      };
+
+      const endpoint = classUnderTest.create();
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
+
 });
