@@ -3,19 +3,24 @@ const {
 } = require("./controllers/api-records-controller");
 const { DynamoDBException } = require("./models/exceptions/dynamoException");
 const _faker = require("faker");
+const randexp = require("randexp").randexp;
 
 describe("API Records Controller", () => {
-  let classUnderTest, mockUseCase;
+  let classUnderTest, mockUseCase, mockMapper;
 
   beforeAll(() => {
+    mockMapper = {
+      toDomain: jest.fn(),
+    };
     mockUseCase = {
       executePost: jest.fn(),
     };
-    classUnderTest = new APIRecordsController(mockUseCase);
+    classUnderTest = new APIRecordsController(mockUseCase, mockMapper);
   });
 
   afterEach(() => {
     mockUseCase.executePost.mockReset();
+    mockMapper.toDomain.mockReset();
   });
 
   describe("Base endpoint method", () => {
@@ -226,7 +231,7 @@ describe("API Records Controller", () => {
 
       // assert
       expect(endpointResponse).toStrictEqual(expectedResponse);
-});
+    });
 
     it("should return a function that performs validation checking whether GithubId is a number", async () => {
       // arrange
@@ -258,4 +263,28 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
+    it("should return a function that calls the presentation to domain mapper with the input event body", async () => {
+      // arrange
+      const event = {
+        body: {
+          name: _faker.random.word(3),
+          githubId: _faker.datatype.number(),
+          baseUrl: { staging: _faker.internet.url() },
+          githubUrl: _faker.internet.url(),
+        },
+      };
+      const context = {};
+
+      const endpoint = classUnderTest.create();
+
+      // act
+      await endpoint(event, context);
+
+      // assert
+      expect(mockMapper.toDomain).toHaveBeenCalledTimes(1);
+      expect(mockMapper.toDomain).toHaveBeenCalledWith(event.body);
+    });
+    // implementation call to UC
+    // implementation returns
+  });
 });

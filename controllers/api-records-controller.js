@@ -83,6 +83,7 @@ class APIRecordsController {
         },
       ],
       implementation: async (event, context) => {
+        this._presentationDomainMapper.toDomain(event.body);
       },
     });
   }
