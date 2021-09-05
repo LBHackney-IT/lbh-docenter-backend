@@ -16,7 +16,7 @@ class APIRecordsController {
         )
 
       try {
-        await implementation(event, context);
+        return await implementation(event, context);
       } catch (e) {
         if (e instanceof DynamoDBException) {
           return {

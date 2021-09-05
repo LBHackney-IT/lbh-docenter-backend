@@ -138,7 +138,33 @@ describe("API Records Controller", () => {
       // assert
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
-    // upon successful execution, returns whatever implementation returns
+
+    it("should return a function that upon successful code execution forwards the server response from implementation back to API Gateway", async () => {
+      // arrange
+      const event = { pathParameters: "", body: "" };
+      const context = {};
+
+      const expectedResponse = {
+        statusCode: 200,
+        body: {
+          data: {
+            prop1: "Heart of the Cards, guide me! I draw!",
+            prop2: 40,
+          },
+        },
+      };
+
+      const endpoint = classUnderTest.baseEndpoint({
+        validators: [],
+        implementation: () => expectedResponse,
+      });
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
     // test that returns 400 upon validation errors
   });
 });
