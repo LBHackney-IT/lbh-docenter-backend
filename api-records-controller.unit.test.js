@@ -110,7 +110,34 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
-    // handles implementation throwing a generic error
+    it("should return a function that handles Any type of error from within implementation function by returning a custom response", async () => {
+      // arrange
+      const event = { pathParameters: "", body: "" };
+      const context = {};
+
+      const expectedErrorMessage = _faker.random.words(3);
+
+      const endpoint = classUnderTest.baseEndpoint({
+        validators: [],
+        implementation: () => {
+          throw new Error(expectedErrorMessage);
+        },
+      });
+
+      const expectedResponse = {
+        statusCode: 500,
+        body: {
+          userMessage: "Unexpected server error.",
+          errorMessage: expectedErrorMessage,
+        },
+      };
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
     // upon successful execution, returns whatever implementation returns
     // test that returns 400 upon validation errors
   });

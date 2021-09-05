@@ -27,6 +27,13 @@ class APIRecordsController {
             },
           };
         } else {
+          return {
+            statusCode: 500,
+            body: {
+              userMessage: "Unexpected server error.",
+              errorMessage: e.message,
+            },
+          };
         }
       }
     };
