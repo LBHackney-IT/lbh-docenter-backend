@@ -6,6 +6,24 @@ class APIRecordsGateway {
     this.executePost = this.executePost.bind(this);
   }
 
+  // Check whether a repository is already registered within database
+  async existsCheck(githubId) {
+    const getResult = await this._databaseContext
+      .scan({
+        TableName: process.env.DYNAMODB_APIS_TABLE,
+        FilterExpression: "#gId = :gId",
+        ExpressionAttributeNames: {
+          "#gId": "githubId",
+        },
+        ExpressionAttributeValues: {
+          ":gId": parseInt(githubId),
+        },
+      })
+      .promise();
+
+    return getResult.Items.length > 0;
+  }
+
   async executePost(dataBoundary) {
     let createParams = {
       TableName: process.env.DYNAMODB_APIS_TABLE,
