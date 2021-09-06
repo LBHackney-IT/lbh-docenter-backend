@@ -84,6 +84,9 @@ class APIRecordsController {
       implementation: async (event, context) => {
         const domainBoundary = this._apiRecordsPDMapper.toDomain(event.body);
         await this._apiRecordUseCase.executePost(domainBoundary);
+        return {
+          statusCode: 201,
+        };
       },
     });
   }

@@ -312,6 +312,30 @@ describe("API Records Controller", () => {
       expect(mockUseCase.executePost).toHaveBeenCalledTimes(1);
       expect(mockUseCase.executePost).toHaveBeenCalledWith(dummyMapperResponse);
     });
-    // implementation returns
+
+    it("should retuned a function that returns 201 Created upon successful, error-free execution.", async () => {
+      // arrange
+      const event = {
+        body: {
+          name: _faker.random.word(3),
+          githubId: _faker.datatype.number(),
+          baseUrl: { staging: _faker.internet.url() },
+          githubUrl: _faker.internet.url(),
+        },
+      };
+      const context = {};
+
+      const endpoint = classUnderTest.create();
+
+      const expectedResponse = {
+        statusCode: 201,
+      };
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
   });
 });
