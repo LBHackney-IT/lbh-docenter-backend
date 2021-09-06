@@ -2,6 +2,9 @@
 
 const _faker = require("faker");
 const { APIRecordUseCase } = require("./api-record-uc");
+const {
+  DuplicateRecordException,
+} = require("../models/exceptions/duplicateRecordException");
 
 describe("API Records Use Case", () => {
   describe("Execute Post method", () => {
@@ -20,6 +23,9 @@ describe("API Records Use Case", () => {
     });
 
     it("should call the gateway Post method once", async () => {
+      // arrange
+      mockGateway.existsCheck.mockResolvedValue(false);
+
       // act
       await classUnderTest.executePost({});
 
@@ -28,6 +34,9 @@ describe("API Records Use Case", () => {
     });
 
     it("should call the domainToData mapper method once", async () => {
+      // arrange
+      mockGateway.existsCheck.mockResolvedValue(false);
+
       // act
       await classUnderTest.executePost({});
 
@@ -41,6 +50,8 @@ describe("API Records Use Case", () => {
         name: _faker.random.words(3),
         baseUrl: _faker.internet.url(),
       };
+
+      mockGateway.existsCheck.mockResolvedValue(false);
 
       // act
       await classUnderTest.executePost(usecaseArg);
@@ -57,6 +68,7 @@ describe("API Records Use Case", () => {
         baseUrl: _faker.internet.url(),
       };
 
+      mockGateway.existsCheck.mockResolvedValue(false);
       mockMapper.domainToData.mockReturnValue(dataLayerObj);
 
       // act
@@ -86,6 +98,39 @@ describe("API Records Use Case", () => {
 
       // assert
       expect(mockGateway.existsCheck).toHaveBeenCalledWith(usecaseArg.githubId);
+    });
+
+    it("should throw a DuplicateRecordException if a record to be inserted already exists", async () => {
+      // arrange
+      const githubId = _faker.datatype.number(10 ** 9, 10 ** 10 - 1);
+      const expectedException = new DuplicateRecordException(
+        `The project from this repository (githubId: ${githubId}) already exists!`
+      ); //I live in a Twilight Zone!
+
+      mockGateway.existsCheck.mockResolvedValue(true);
+
+      // act
+      const testDelegate = async () =>
+        await classUnderTest.executePost({ githubId });
+
+      // assert
+      await expect(testDelegate).rejects.toThrow(expectedException.message);
+    });
+
+    it("should call neither mapper, nor usecase when API Record already exists", async () => {
+      // arrange
+      const githubId = _faker.datatype.number(10 ** 9, 10 ** 10 - 1);
+
+      mockGateway.existsCheck.mockResolvedValue(true);
+
+      try {
+        // act
+        await classUnderTest.executePost({ githubId });
+      } catch {
+        // assert
+        expect(mockMapper.domainToData).not.toHaveBeenCalled();
+        expect(mockGateway.executePost).not.toHaveBeenCalled();
+      }
     });
   });
 });
