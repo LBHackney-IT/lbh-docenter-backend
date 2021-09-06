@@ -1,6 +1,9 @@
 const {
   APIRecordsController,
 } = require("./controllers/api-records-controller");
+const {
+  DuplicateRecordException,
+} = require("./models/exceptions/duplicateRecordException");
 const { DynamoDBException } = require("./models/exceptions/dynamoException");
 const _faker = require("faker");
 const randexp = require("randexp").randexp;
@@ -329,6 +332,35 @@ describe("API Records Controller", () => {
 
       const expectedResponse = {
         statusCode: 201,
+      };
+
+      // act
+      const endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
+
+    it("should return a function that handles DuplicateRecordException failure within implementation by returning a custom response", async () => {
+      // arrange
+      const event = { pathParameters: "", body: "" };
+      const context = {};
+
+      const expectedErrorMessage = `The project from this repository (githubId: ${_faker.datatype.number()}) already exists!`;
+
+      const endpoint = classUnderTest.baseEndpoint({
+        validators: [],
+        implementation: () => {
+          throw new DuplicateRecordException(expectedErrorMessage);
+        },
+      });
+
+      const expectedResponse = {
+        statusCode: 409,
+        body: {
+          userMessage: expectedErrorMessage,
+          errorMessage: expectedErrorMessage,
+        },
       };
 
       // act

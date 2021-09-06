@@ -1,5 +1,8 @@
 const { DynamoDBException } = require("../models/exceptions/dynamoException");
 const { nonEmpty } = require("../helpers/actual/validation");
+const {
+  DuplicateRecordException,
+} = require("../models/exceptions/duplicateRecordException");
 
 class APIRecordsController {
   constructor(apiRecordUseCase, apiRecordsPDMapper) {
@@ -26,7 +29,15 @@ class APIRecordsController {
       try {
         return await implementation(event, context);
       } catch (e) {
-        if (e instanceof DynamoDBException) {
+        if (e instanceof DuplicateRecordException) {
+          return {
+            statusCode: 409,
+            body: {
+              userMessage: e.message,
+              errorMessage: e.message,
+            },
+          };
+        } else if (e instanceof DynamoDBException) {
           return {
             statusCode: 503,
             body: {
