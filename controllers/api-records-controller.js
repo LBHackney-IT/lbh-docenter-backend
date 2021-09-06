@@ -2,10 +2,9 @@ const { DynamoDBException } = require("../models/exceptions/dynamoException");
 const { nonEmpty } = require("../helpers/actual/validation");
 
 class APIRecordsController {
-  constructor(apiRecordUC, presentationDomainMapper) {
-    this._apiRecordUC = apiRecordUC;
-    this._presentationDomainMapper = presentationDomainMapper;
-    this.create = this.create.bind(this);
+  constructor(apiRecordUseCase, apiRecordsPDMapper) {
+    this._apiRecordUseCase = apiRecordUseCase;
+    this._apiRecordsPDMapper = apiRecordsPDMapper;
   }
 
   baseEndpoint({ validators, implementation }) {
@@ -83,7 +82,8 @@ class APIRecordsController {
         },
       ],
       implementation: async (event, context) => {
-        this._presentationDomainMapper.toDomain(event.body);
+        const domainBoundary = this._apiRecordsPDMapper.toDomain(event.body);
+        await this._apiRecordUseCase.executePost(domainBoundary);
       },
     });
   }

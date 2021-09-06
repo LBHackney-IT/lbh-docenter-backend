@@ -284,7 +284,34 @@ describe("API Records Controller", () => {
       expect(mockMapper.toDomain).toHaveBeenCalledTimes(1);
       expect(mockMapper.toDomain).toHaveBeenCalledWith(event.body);
     });
-    // implementation call to UC
+
+    it("should return a function that calls the use case with the the output of presentation to domain mapper", async () => {
+      // arrange
+      const event = {
+        body: {
+          name: _faker.random.word(3),
+          githubId: _faker.datatype.number(),
+          baseUrl: { staging: _faker.internet.url() },
+          githubUrl: _faker.internet.url(),
+        },
+      };
+      const context = {};
+      const dummyMapperResponse = {
+        prop1: "abc",
+        prop2: 78,
+      };
+
+      mockMapper.toDomain.mockReturnValue(dummyMapperResponse);
+
+      const endpoint = classUnderTest.create();
+
+      // act
+      await endpoint(event, context);
+
+      // assert
+      expect(mockUseCase.executePost).toHaveBeenCalledTimes(1);
+      expect(mockUseCase.executePost).toHaveBeenCalledWith(dummyMapperResponse);
+    });
     // implementation returns
   });
 });
