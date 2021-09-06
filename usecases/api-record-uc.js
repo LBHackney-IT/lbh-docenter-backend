@@ -5,6 +5,7 @@ class APIRecordUseCase {
   }
 
   async executePost(domainBoundary) {
+    await this._apiRecordGateway.existsCheck(domainBoundary?.githubId);
     const dataBoundary = this._domainDataMapper.domainToData(domainBoundary);
     await this._apiRecordGateway.executePost(dataBoundary);
   }
