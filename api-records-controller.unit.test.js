@@ -8,7 +8,7 @@ const { DynamoDBException } = require("./models/exceptions/dynamoException");
 const _faker = require("faker");
 const randexp = require("randexp").randexp;
 
-describe("API Records Controller", () => {
+xdescribe("API Records Controller", () => {
   let classUnderTest, mockUseCase, mockMapper;
 
   beforeAll(() => {
