@@ -1,4 +1,5 @@
 const {
+  APIRecord,
   Environments,
   Dependencies,
   DependencyDatabase,
@@ -9,7 +10,20 @@ const {
 } = require("../models");
 
 class PresentationDomainMapper {
-  toDomain(userInput) {}
+  toDomain(userInput) {
+    return new APIRecord({
+      id: userInput.id,
+      githubId: userInput.githubId,
+      name: userInput.name,
+      githubUrl: userInput.githubUrl,
+      status: userInput.status,
+      baseUrl: this.toDomain_Environments(userInput.baseUrl),
+      dependencies: this.toDomain_Dependencies(userInput.dependencies),
+      otherDocumentation: this.toDomain_OtherDocumentation(
+        userInput.otherDocumentation
+      ),
+    });
+  }
 
   // sub-mappers
   toDomain_OtherDocumentation(userInput) {

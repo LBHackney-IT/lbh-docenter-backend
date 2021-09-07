@@ -78,6 +78,7 @@ const generateEnvironmentsStrict = () => {
 
 const generateAPIRecord = () => {
   return new APIRecord({
+    id: faker.datatype.string(8),
     githubId: faker.datatype.number(10 ** 9, 10 ** 10 - 1),
     name: faker.random.words(3),
     baseUrl: new Environments({

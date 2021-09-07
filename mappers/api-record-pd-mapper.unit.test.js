@@ -7,6 +7,7 @@ const {
   generateDependencyDatabase,
   generateEnvironmentsStrict,
   generateDependenciesStrict,
+  generateAPIRecord,
 } = require("../helpers/tests/generators");
 
 const faker = require("faker");
@@ -241,7 +242,7 @@ describe("Presentation/Domain boundary mapper", () => {
       expect(mappedResult.databases).toContain(44);
     });
 
-    it("toDomain_Dependencies method calls toDomain_Endpoint method for mapping the given list of endpoints", () => {
+    it("toDomain_Dependencies method calls child entity mapper methods", () => {
       // arrange
       const inputObject = generateDependenciesStrict();
 
@@ -283,6 +284,76 @@ describe("Presentation/Domain boundary mapper", () => {
 
       // act
       const mappedResult = classUnderTest.toDomain_Dependencies(inputObject);
+
+      const mappedResultKeys = Object.keys(mappedResult);
+
+      // assert
+      expect(mappedResultKeys).not.toContain(nonExistingKey);
+    });
+  });
+
+  describe("toDomain (APIRecord) method", () => {
+    it("should correctly map the expected model fields", () => {
+      // arrange
+      const inputObject = generateAPIRecord();
+
+      classUnderTest.toDomain_Environments = jest.fn().mockReturnValue(42);
+      classUnderTest.toDomain_Dependencies = jest.fn().mockReturnValue(43);
+      classUnderTest.toDomain_OtherDocumentation = jest
+        .fn()
+        .mockReturnValue(44);
+
+      // act
+      const mappedResult = classUnderTest.toDomain(inputObject);
+
+      // assert
+      expect(mappedResult.id).toEqual(inputObject.id);
+      expect(mappedResult.githubId).toEqual(inputObject.githubId);
+      expect(mappedResult.name).toEqual(inputObject.name);
+      expect(mappedResult.githubUrl).toEqual(inputObject.githubUrl);
+      expect(mappedResult.status).toEqual(inputObject.status);
+
+      expect(mappedResult.baseUrl).toEqual(42);
+      expect(mappedResult.dependencies).toEqual(43);
+      expect(mappedResult.otherDocumentation).toEqual(44);
+    });
+
+    it("toDomain method calls child entity mapper methods", () => {
+      // arrange
+      const inputObject = generateAPIRecord();
+
+      classUnderTest.toDomain_Environments = jest.fn();
+      classUnderTest.toDomain_Dependencies = jest.fn();
+      classUnderTest.toDomain_OtherDocumentation = jest.fn();
+
+      // act
+      classUnderTest.toDomain(inputObject);
+
+      // assert
+      expect(classUnderTest.toDomain_Environments).toHaveBeenCalledTimes(1);
+      expect(classUnderTest.toDomain_Environments).toHaveBeenLastCalledWith(
+        inputObject.baseUrl
+      );
+      expect(classUnderTest.toDomain_Dependencies).toHaveBeenCalledTimes(1);
+      expect(classUnderTest.toDomain_Dependencies).toHaveBeenLastCalledWith(
+        inputObject.dependencies
+      );
+      expect(classUnderTest.toDomain_OtherDocumentation).toHaveBeenCalledTimes(
+        1
+      );
+      expect(
+        classUnderTest.toDomain_OtherDocumentation
+      ).toHaveBeenLastCalledWith(inputObject.otherDocumentation);
+    });
+
+    it("should not map over fields that are not part of the data model", () => {
+      // arrange
+      const inputObject = generateAPIRecord();
+      const nonExistingKey = faker.datatype.string(7);
+      inputObject[nonExistingKey] = faker.datatype.string(5);
+
+      // act
+      const mappedResult = classUnderTest.toDomain(inputObject);
 
       const mappedResultKeys = Object.keys(mappedResult);
 
