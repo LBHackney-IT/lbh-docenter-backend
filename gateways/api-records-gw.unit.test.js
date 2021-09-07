@@ -96,4 +96,31 @@ describe("API Records Gateway", () => {
       await expect(actualResult).toEqual(expectedResult);
     });
   });
+
+  describe("Execute Get method", () => {
+    it("should retrieve a record with a matching id when it exists", async () => {
+      // arrange
+      const searchDataBoundary = {
+        id: _faker.datatype.string(8),
+      };
+
+      const expectedItem = {
+        id: searchDataBoundary.id,
+        name: _faker.datatype.string(5),
+      };
+
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: expectedItem,
+        })
+        .promise();
+
+      // act
+      const actualResult = await classUnderTest.executeGet(searchDataBoundary);
+
+      // assert
+      expect(actualResult.Item).toStrictEqual(expectedItem);
+    });
+  });
 });

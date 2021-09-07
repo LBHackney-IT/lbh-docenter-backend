@@ -44,6 +44,17 @@ class APIRecordsGateway {
       throw new DynamoDBException(createError);
     }
   }
+
+  async executeGet(dataBoundary) {
+    return await this._databaseContext
+      .get({
+        TableName: process.env.DYNAMODB_APIS_TABLE,
+        Key: {
+          id: dataBoundary.id,
+        },
+      })
+      .promise();
+  }
 }
 
 module.exports = {
