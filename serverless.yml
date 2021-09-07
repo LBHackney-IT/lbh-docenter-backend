@@ -66,33 +66,34 @@ provider:
 plugins:
   - serverless-pseudo-parameters
   - serverless-offline
+
 functions:
   hello:
-    handler: api-records-controller.hello
+    handler: handler.hello
     events:
       - http:
           path: /v1/hello
           method: get
   createAPI:
-    handler: api-records-controller.createAPI
+    handler: handler.createAPI
     events:
       - http:
           path: /v1/apis
           method: post
   listAPIs:
-    handler: api-records-controller.listAPIs
+    handler: handler.listAPIs
     events:
       - http:
           path: /v1/apis
           method: get
   getAPI:
-    handler: api-records-controller.getAPI
+    handler: handler.getAPI
     events:
       - http:
           path: /v1/apis/{id}
           method: get
   patchAPI:
-    handler: api-records-controller.patchAPI
+    handler: handler.patchAPI
     events:
       - http:
           path: /v1/apis/{id}
