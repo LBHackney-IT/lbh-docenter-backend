@@ -19,6 +19,10 @@ class APIRecordUseCase {
     const dataBoundary = this._domainDataMapper.domainToData(domainBoundary);
     await this._apiRecordGateway.executePost(dataBoundary);
   }
+
+  async executeGet(domainBoundary) {
+    await this._apiRecordGateway.executeGet();
+  }
 }
 
 module.exports = {

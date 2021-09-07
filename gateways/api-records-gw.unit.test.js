@@ -123,7 +123,7 @@ describe("API Records Gateway", () => {
       const actualResult = await classUnderTest.executeGet(searchDataBoundary);
 
       // assert
-      expect(actualResult.Item).toStrictEqual(expectedItem);
+      expect(actualResult).toStrictEqual(expectedItem);
     });
 
     it("should throw a Record Not Found exception when no record matching given id is found", async () => {

@@ -7,21 +7,25 @@ const {
 } = require("../models/exceptions/duplicateRecordException");
 
 describe("API Records Use Case", () => {
+  let mockGateway, mockMapper, classUnderTest;
+
+  beforeAll(() => {
+    mockGateway = {
+      executePost: jest.fn(),
+      existsCheck: jest.fn(),
+      executeGet: jest.fn(),
+    };
+    mockMapper = { domainToData: jest.fn(), dataToDomain: jest.fn() };
+    classUnderTest = new APIRecordUseCase(mockGateway, mockMapper);
+  });
+
+  afterEach(() => {
+    mockGateway.executePost.mockReset();
+    mockGateway.existsCheck.mockReset();
+    mockMapper.domainToData.mockReset();
+  });
+
   describe("Execute Post method", () => {
-    let mockGateway, mockMapper, classUnderTest;
-
-    beforeAll(() => {
-      mockGateway = { executePost: jest.fn(), existsCheck: jest.fn() };
-      mockMapper = { domainToData: jest.fn(), dataToDomain: jest.fn() };
-      classUnderTest = new APIRecordUseCase(mockGateway, mockMapper);
-    });
-
-    afterEach(() => {
-      mockGateway.executePost.mockReset();
-      mockGateway.existsCheck.mockReset();
-      mockMapper.domainToData.mockReset();
-    });
-
     it("should call the gateway Post method once", async () => {
       // arrange
       mockGateway.existsCheck.mockResolvedValue(false);
@@ -131,6 +135,16 @@ describe("API Records Use Case", () => {
         expect(mockMapper.domainToData).not.toHaveBeenCalled();
         expect(mockGateway.executePost).not.toHaveBeenCalled();
       }
+    });
+  });
+
+  describe("Execute Get method", () => {
+    it("should call the gateway Get method once", async () => {
+      // act
+      await classUnderTest.executeGet({});
+
+      // assert
+      expect(mockGateway.executeGet).toHaveBeenCalledTimes(1);
     });
   });
 });
