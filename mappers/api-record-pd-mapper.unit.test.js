@@ -6,6 +6,7 @@ const {
   generateDependencyScript,
   generateDependencyDatabase,
   generateEnvironmentsStrict,
+  generateDependenciesStrict,
 } = require("../helpers/tests/generators");
 
 const faker = require("faker");
@@ -212,6 +213,76 @@ describe("Presentation/Domain boundary mapper", () => {
 
       // act
       const mappedResult = classUnderTest.toDomain_Environments(inputObject);
+
+      const mappedResultKeys = Object.keys(mappedResult);
+
+      // assert
+      expect(mappedResultKeys).not.toContain(nonExistingKey);
+    });
+  });
+
+  describe("toDomain_Dependencies method", () => {
+    it("should correctly map the expected model fields", () => {
+      // arrange
+      const inputObject = generateDependenciesStrict();
+
+      classUnderTest.toDomain_DependencyAPI = jest.fn().mockReturnValue(42);
+      classUnderTest.toDomain_DependencyScript = jest.fn().mockReturnValue(43);
+      classUnderTest.toDomain_DependencyDatabase = jest
+        .fn()
+        .mockReturnValue(44);
+
+      // act
+      const mappedResult = classUnderTest.toDomain_Dependencies(inputObject);
+
+      // assert
+      expect(mappedResult.apis).toContain(42);
+      expect(mappedResult.scripts).toContain(43);
+      expect(mappedResult.databases).toContain(44);
+    });
+
+    it("toDomain_Dependencies method calls toDomain_Endpoint method for mapping the given list of endpoints", () => {
+      // arrange
+      const inputObject = generateDependenciesStrict();
+
+      classUnderTest.toDomain_DependencyAPI = jest.fn();
+      classUnderTest.toDomain_DependencyScript = jest.fn();
+      classUnderTest.toDomain_DependencyDatabase = jest.fn();
+
+      // act
+      classUnderTest.toDomain_Dependencies(inputObject);
+
+      // assert
+      expect(classUnderTest.toDomain_DependencyAPI).toHaveBeenCalledTimes(
+        inputObject.apis.length
+      );
+      expect(classUnderTest.toDomain_DependencyAPI).toHaveBeenLastCalledWith(
+        inputObject.apis[inputObject.apis.length - 1]
+      );
+      expect(classUnderTest.toDomain_DependencyScript).toHaveBeenCalledTimes(
+        inputObject.scripts.length
+      );
+      expect(classUnderTest.toDomain_DependencyScript).toHaveBeenLastCalledWith(
+        inputObject.scripts[inputObject.scripts.length - 1]
+      );
+      expect(classUnderTest.toDomain_DependencyDatabase).toHaveBeenCalledTimes(
+        inputObject.databases.length
+      );
+      expect(
+        classUnderTest.toDomain_DependencyDatabase
+      ).toHaveBeenLastCalledWith(
+        inputObject.databases[inputObject.databases.length - 1]
+      );
+    });
+
+    it("should not map over fields that are not part of the data model", () => {
+      // arrange
+      const inputObject = generateDependenciesStrict();
+      const nonExistingKey = faker.datatype.string(7);
+      inputObject[nonExistingKey] = faker.datatype.string(5);
+
+      // act
+      const mappedResult = classUnderTest.toDomain_Dependencies(inputObject);
 
       const mappedResultKeys = Object.keys(mappedResult);
 

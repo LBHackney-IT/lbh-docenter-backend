@@ -61,6 +61,13 @@ const generateDependencies = () =>
     databases: nItems(randInt(1, 4), generateDependencyDatabase),
   });
 
+const generateDependenciesStrict = () =>
+  new Dependencies({
+    apis: nItems(randInt(1, 3), generateDependencyAPI),
+    scripts: nItems(randInt(1, 2), generateDependencyScript),
+    databases: nItems(randInt(1, 4), generateDependencyDatabase),
+  });
+
 const generateEnvironmentsStrict = () => {
   return new Environments({
     development: faker.datatype.string(8),
@@ -92,4 +99,5 @@ module.exports = {
   generateDependencyAPI,
   generateEndpoint,
   generateEnvironmentsStrict,
+  generateDependenciesStrict,
 };

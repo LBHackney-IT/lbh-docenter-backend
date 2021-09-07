@@ -1,5 +1,6 @@
 const {
   Environments,
+  Dependencies,
   DependencyDatabase,
   DependencyAPI,
   Endpoint,
@@ -56,6 +57,18 @@ class PresentationDomainMapper {
       development: userInput.development,
       staging: userInput.staging,
       production: userInput.production,
+    });
+  }
+
+  toDomain_Dependencies(userInput) {
+    return new Dependencies({
+      apis: userInput.apis.map((api) => this.toDomain_DependencyAPI(api)),
+      scripts: userInput.scripts.map((script) =>
+        this.toDomain_DependencyScript(script)
+      ),
+      databases: userInput.databases.map((database) =>
+        this.toDomain_DependencyDatabase(database)
+      ),
     });
   }
 }
