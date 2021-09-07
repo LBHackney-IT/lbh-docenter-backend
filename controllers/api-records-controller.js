@@ -12,18 +12,28 @@ class APIRecordsController {
 
   baseEndpoint({ validators, implementation }) {
     return async (event, context) => {
+      // TODO: Adjust the tests to work with body as a string!
+      // Add test for baseEndpoint parsing event.body
+      // from typeof string to typeof object
+      // should equal to self deparsed
+      const payload = JSON.parse(event.body);
+      event.body = payload;
       const validationErrors = validators
         ?.filter(
-          (rule) => !rule.validate({ ...event.pathParameters, ...event.body })
+          (rule) =>
+            !rule.validate({
+              ...event.pathParameters,
+              ...payload,
+            })
         )
         .map((rule) => rule.failureMessage);
 
       if (validationErrors?.length > 0)
         return {
           statusCode: 400,
-          body: {
+          body: JSON.stringify({
             validationErrors,
-          },
+          }),
         };
 
       try {
@@ -32,26 +42,26 @@ class APIRecordsController {
         if (e instanceof DuplicateRecordException) {
           return {
             statusCode: 409,
-            body: {
+            body: JSON.stringify({
               userMessage: e.message,
               errorMessage: e.message,
-            },
+            }),
           };
         } else if (e instanceof DynamoDBException) {
           return {
             statusCode: 503,
-            body: {
+            body: JSON.stringify({
               userMessage: "Dynamo client error. Please try again later.",
               errorMessage: e.message,
-            },
+            }),
           };
         } else {
           return {
             statusCode: 500,
-            body: {
+            body: JSON.stringify({
               userMessage: "Unexpected server error.",
               errorMessage: e.message,
-            },
+            }),
           };
         }
       }
