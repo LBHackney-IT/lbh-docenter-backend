@@ -1,4 +1,5 @@
 const {
+  DependencyAPI,
   Endpoint,
   OtherDocumentation,
 } = require("../models");
@@ -18,6 +19,16 @@ class PresentationDomainMapper {
     return new Endpoint({
       httpMethod: userInput.httpMethod,
       name: userInput.name,
+    });
+  }
+
+  toDomain_DependencyAPI(userInput) {
+    return new DependencyAPI({
+      apiId: userInput.apiId,
+      apiName: userInput.apiName,
+      endpointsUsingIt: userInput.endpointsUsingIt.map((endpoint) =>
+        this.toDomain_Endpoint(endpoint)
+      ),
     });
   }
 }
