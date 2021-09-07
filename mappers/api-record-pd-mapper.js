@@ -1,6 +1,7 @@
 const {
   DependencyAPI,
   Endpoint,
+  DependencyScript,
   OtherDocumentation,
 } = require("../models");
 
@@ -29,6 +30,13 @@ class PresentationDomainMapper {
       endpointsUsingIt: userInput.endpointsUsingIt.map((endpoint) =>
         this.toDomain_Endpoint(endpoint)
       ),
+    });
+  }
+
+  toDomain_DependencyScript(userInput) {
+    return new DependencyScript({
+      name: userInput.name,
+      description: userInput.description,
     });
   }
 }
