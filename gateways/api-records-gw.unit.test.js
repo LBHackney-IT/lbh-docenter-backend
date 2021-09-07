@@ -5,6 +5,9 @@ const {
 } = require("../helpers/tests/dynamoOps");
 const { APIRecordsGateway } = require("./api-records-gw");
 const { DynamoDBException } = require("../models/exceptions/dynamoException");
+const {
+  RecordNotFoundException,
+} = require("../models/exceptions/recordNotFoundException");
 const { dynamodbClient } = require("../database-contexts/dynamodb");
 const _faker = require("faker");
 
@@ -121,6 +124,35 @@ describe("API Records Gateway", () => {
 
       // assert
       expect(actualResult.Item).toStrictEqual(expectedItem);
+    });
+
+    it("should throw a Record Not Found exception when no record matching given id is found", async () => {
+      // arrange
+      const searchDataBoundary = {
+        id: _faker.datatype.string(8),
+      };
+
+      const nonMatchingItem = {
+        id: _faker.datatype.string(8),
+        name: _faker.datatype.string(5),
+      };
+
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: nonMatchingItem,
+        })
+        .promise();
+
+      const expectedException = new RecordNotFoundException(
+        `Record with id: ${searchDataBoundary.id} was not found.`
+      );
+
+      // act
+      const testDelegate = () => classUnderTest.executeGet(searchDataBoundary);
+
+      // assert
+      await expect(testDelegate).rejects.toThrow(expectedException.message);
     });
   });
 });
