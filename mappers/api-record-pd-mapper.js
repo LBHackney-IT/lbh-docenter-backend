@@ -1,4 +1,5 @@
 const {
+  DependencyDatabase,
   DependencyAPI,
   Endpoint,
   DependencyScript,
@@ -37,6 +38,15 @@ class PresentationDomainMapper {
     return new DependencyScript({
       name: userInput.name,
       description: userInput.description,
+    });
+  }
+
+  toDomain_DependencyDatabase(userInput) {
+    return new DependencyDatabase({
+      name: userInput.name,
+      technicalName: userInput.technicalName,
+      type: userInput.type,
+      hostedAt: userInput.hostedAt,
     });
   }
 }

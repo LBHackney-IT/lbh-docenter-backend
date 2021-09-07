@@ -4,6 +4,7 @@ const {
   generateEndpoint,
   generateDependencyAPI,
   generateDependencyScript,
+  generateDependencyDatabase,
 } = require("../helpers/tests/generators");
 
 const faker = require("faker");
@@ -147,6 +148,39 @@ describe("Presentation/Domain boundary mapper", () => {
       // act
       const mappedResult =
         classUnderTest.toDomain_DependencyScript(inputObject);
+
+      const mappedResultKeys = Object.keys(mappedResult);
+
+      // assert
+      expect(mappedResultKeys).not.toContain(nonExistingKey);
+    });
+  });
+
+  describe("toDomain_DependencyDatabase method", () => {
+    it("should correctly map the expected model fields", () => {
+      // arrange
+      const inputObject = generateDependencyDatabase();
+
+      // act
+      const mappedResult =
+        classUnderTest.toDomain_DependencyDatabase(inputObject);
+
+      // assert
+      expect(mappedResult.name).toEqual(inputObject.name);
+      expect(mappedResult.technicalName).toEqual(inputObject.technicalName);
+      expect(mappedResult.type).toEqual(inputObject.type);
+      expect(mappedResult.hostedAt).toEqual(inputObject.hostedAt);
+    });
+
+    it("should not map over fields that are not part of the data model", () => {
+      // arrange
+      const inputObject = generateDependencyDatabase();
+      const nonExistingKey = faker.datatype.string(7);
+      inputObject[nonExistingKey] = faker.datatype.string(5);
+
+      // act
+      const mappedResult =
+        classUnderTest.toDomain_DependencyDatabase(inputObject);
 
       const mappedResultKeys = Object.keys(mappedResult);
 
