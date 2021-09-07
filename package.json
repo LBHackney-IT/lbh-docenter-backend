@@ -1,0 +1,24 @@
+{
+  "name": "lbh-docenter-backend",
+  "version": "1.0.0",
+  "description": "A back-end for storing and updating the documentation related information of various project repositories",
+  "main": "api-records-controller.js",
+  "scripts": {
+    "unit": "eval \"$(cat .env.unit | tr '\n' ' ') jest \"\\.unit\\.test\\.js\"\"",
+    "lambdaLocal": "eval \"$(cat .env.unit | tr '\n' ' ') make local\""
+  },
+  "repository": "https://github.com/LBHackney-IT/lbh-docenter-backend.git",
+  "author": "duslerke <liudvikast@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "aws-sdk": "^2.980.0"
+  },
+  "devDependencies": {
+    "faker": "^5.5.3",
+    "jest": "^27.1.0",
+    "randexp": "^0.5.3",
+    "serverless-offline": "^8.0.0",
+    "serverless-pseudo-parameters": "^2.6.0"
+  }
+}

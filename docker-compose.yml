@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  local-dynamodb:
+    image: amazon/dynamodb-local
+    command: -jar DynamoDBLocal.jar -sharedDb -inMemory
+    ports:
+      - "8000:8000"
