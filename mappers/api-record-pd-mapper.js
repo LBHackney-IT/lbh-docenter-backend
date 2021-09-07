@@ -1,4 +1,5 @@
 const {
+  Environments,
   DependencyDatabase,
   DependencyAPI,
   Endpoint,
@@ -47,6 +48,14 @@ class PresentationDomainMapper {
       technicalName: userInput.technicalName,
       type: userInput.type,
       hostedAt: userInput.hostedAt,
+    });
+  }
+
+  toDomain_Environments(userInput) {
+    return new Environments({
+      development: userInput.development,
+      staging: userInput.staging,
+      production: userInput.production,
     });
   }
 }

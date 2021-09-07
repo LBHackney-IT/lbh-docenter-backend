@@ -5,6 +5,7 @@ const {
   generateDependencyAPI,
   generateDependencyScript,
   generateDependencyDatabase,
+  generateEnvironmentsStrict,
 } = require("../helpers/tests/generators");
 
 const faker = require("faker");
@@ -188,14 +189,37 @@ describe("Presentation/Domain boundary mapper", () => {
       expect(mappedResultKeys).not.toContain(nonExistingKey);
     });
   });
+
+  describe("toDomain_Environments method", () => {
+    it("should correctly map the expected model fields", () => {
+      // arrange
+      const inputObject = generateEnvironmentsStrict();
+
+      // act
+      const mappedResult = classUnderTest.toDomain_Environments(inputObject);
+
+      // assert
+      expect(mappedResult.development).toEqual(inputObject.development);
+      expect(mappedResult.staging).toEqual(inputObject.staging);
+      expect(mappedResult.production).toEqual(inputObject.production);
+    });
+
+    it("should not map over fields that are not part of the data model", () => {
+      // arrange
+      const inputObject = generateEnvironmentsStrict();
+      const nonExistingKey = faker.datatype.string(7);
+      inputObject[nonExistingKey] = faker.datatype.string(5);
+
+      // act
+      const mappedResult = classUnderTest.toDomain_Environments(inputObject);
+
+      const mappedResultKeys = Object.keys(mappedResult);
+
+      // assert
+      expect(mappedResultKeys).not.toContain(nonExistingKey);
+    });
+  });
 });
 
 // should recursively scan for keys
 //keys should not contain
-
-// const generateDependencyAPI = () =>
-//   new DependencyAPI({
-//     apiId: randexp(/[^\W_]{8}/),
-//     apiName: `${faker.lorem.words(randInt(1, 3))} API`,
-//     endpointsUsingIt: nItems(randInt(1, 3), generateEndpoint),
-//   });

@@ -61,7 +61,15 @@ const generateDependencies = () =>
     databases: nItems(randInt(1, 4), generateDependencyDatabase),
   });
 
-function generateAPIRecord() {
+const generateEnvironmentsStrict = () => {
+  return new Environments({
+    development: faker.datatype.string(8),
+    staging: faker.datatype.string(8),
+    production: faker.datatype.string(8),
+  });
+};
+
+const generateAPIRecord = () => {
   return new APIRecord({
     githubId: faker.datatype.number(10 ** 9, 10 ** 10 - 1),
     name: faker.random.words(3),
@@ -73,7 +81,7 @@ function generateAPIRecord() {
     status: randexp(/ACTIVE|DECOMMISSIONING WARNING|DEPRECATED/),
     otherDocumentation: generateOtherDocumentation(),
   });
-}
+};
 
 module.exports = {
   generateAPIRecord,
@@ -83,4 +91,5 @@ module.exports = {
   generateDependencyScript,
   generateDependencyAPI,
   generateEndpoint,
+  generateEnvironmentsStrict,
 };
