@@ -4,7 +4,8 @@
   "description": "A back-end for storing and updating the documentation related information of various project repositories",
   "main": "api-records-controller.js",
   "scripts": {
-    "unit": "eval \"$(cat .env.unit | tr '\n' ' ') jest \"\\.unit\\.test\\.js\"\""
+    "unit": "eval \"$(cat .env.unit | tr '\n' ' ') jest \"\\.unit\\.test\\.js\"\"",
+    "lambdaLocal": "eval \"$(cat .env.unit | tr '\n' ' ') make local\""
   },
   "repository": "https://github.com/LBHackney-IT/lbh-docenter-backend.git",
   "author": "duslerke <liudvikast@gmail.com>",
