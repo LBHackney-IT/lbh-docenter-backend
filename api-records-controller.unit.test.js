@@ -14,6 +14,7 @@ describe("API Records Controller", () => {
   beforeAll(() => {
     mockMapper = {
       toDomain: jest.fn(),
+      domainToPresentationGet: jest.fn(),
       presentationToDomainGet: jest.fn(),
     };
     mockUseCase = {
@@ -27,6 +28,7 @@ describe("API Records Controller", () => {
     mockUseCase.executePost.mockReset();
     mockUseCase.executeGet.mockReset();
     mockMapper.toDomain.mockReset();
+    mockMapper.domainToPresentationGet.mockReset();
     mockMapper.presentationToDomainGet.mockReset();
   });
 
@@ -444,6 +446,26 @@ describe("API Records Controller", () => {
         );
       });
     });
+
+    it("should call the domain to presentation mapper with use case result", async () => {
+      // arrange
+      const dummyUsecaseResponse = {
+        prop1: "abc",
+        prop2: 78,
+      };
+
+      mockUseCase.executeGet.mockResolvedValue(dummyUsecaseResponse);
+      const endpoint = classUnderTest.get();
+
+      // act
+      endpoint({ body: null }, {}).then(() => {
+        // assert
+        expect(mockMapper.domainToPresentationGet).toHaveBeenCalledTimes(1);
+        expect(mockMapper.domainToPresentationGet).toHaveBeenCalledWith(
+          dummyMapperResponse
+        );
+      });
 });
 
+    });
   });

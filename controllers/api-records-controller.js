@@ -135,7 +135,10 @@ SyntaxError: Unexpected token u in JSON at position 0
         const domainBoundary = this._apiRecordsPDMapper.presentationToDomainGet(
           event.pathParameters
         );
-        await this._apiRecordUseCase.executeGet(domainBoundary);
+        const usecaseResult = await this._apiRecordUseCase.executeGet(
+          domainBoundary
+        );
+        await this._apiRecordsPDMapper.domainToPresentationGet(usecaseResult);
       },
     });
   }
