@@ -8,7 +8,7 @@ const { DynamoDBException } = require("./models/exceptions/dynamoException");
 const _faker = require("faker");
 const randexp = require("randexp").randexp;
 
-xdescribe("API Records Controller", () => {
+describe("API Records Controller", () => {
   let classUnderTest, mockUseCase, mockMapper;
 
   beforeAll(() => {
@@ -26,7 +26,7 @@ xdescribe("API Records Controller", () => {
     mockMapper.toDomain.mockReset();
   });
 
-  describe("Base endpoint method", () => {
+  xdescribe("Base endpoint method", () => {
     it("should return a function that accepts & passes AWS API gateway's event and context objects into custom implementation", async () => {
       // arrange
       const event = {
@@ -208,7 +208,7 @@ xdescribe("API Records Controller", () => {
     });
   });
 
-  describe("Create method", () => {
+  xdescribe("Create method", () => {
     // TODO: don't test all of them at once!
     it("should return a function that performs validation on user input to check whether the required fields are non-empty", async () => {
       // arrange
@@ -341,6 +341,7 @@ xdescribe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
+    // Move the test
     it("should return a function that handles DuplicateRecordException failure within implementation by returning a custom response", async () => {
       // arrange
       const event = { pathParameters: "", body: "" };
@@ -370,4 +371,28 @@ xdescribe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
   });
+
+  describe("Get single method", () => {
+    it("should return a function that performs validation on user input to check whether path parameters are non-empty", async () => {
+      // arrange
+      const event = { body: null };
+      const context = {};
+
+      const expectedResponse = {
+        statusCode: 400,
+        body: JSON.stringify({
+          validationErrors: ["Please provide a non-empty API id."],
+        }),
+      };
+
+      const endpoint = classUnderTest.get();
+
+      // act
+      let endpointResponse = await endpoint(event, context);
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
+    });
 });
+
+  });

@@ -16,6 +16,16 @@ class APIRecordsController {
       // Add test for baseEndpoint parsing event.body
       // from typeof string to typeof object
       // should equal to self deparsed
+
+      /*
+TODO: test this case when body is null
+SyntaxError: Unexpected token u in JSON at position 0
+        at JSON.parse (<anonymous>)
+
+      17 |       // from typeof string to typeof object
+      18 |       // should equal to self deparsed
+    > 19 |       const payload = JSON.parse(event.body);
+      */
       const payload = JSON.parse(event.body);
       event.body = payload;
       const validationErrors = validators
@@ -109,6 +119,19 @@ class APIRecordsController {
           statusCode: 201,
         };
       },
+    });
+  }
+
+  get() {
+    return this.baseEndpoint({
+      validators: [
+        {
+          name: "API id",
+          failureMessage: "Please provide a non-emptendpointResponsey API id.",
+          validate: (inputObj) => nonEmpty(inputObj?.id),
+        },
+      ],
+      implementation: async (event, context) => {},
     });
   }
 }
