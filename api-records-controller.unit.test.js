@@ -465,7 +465,52 @@ describe("API Records Controller", () => {
           dummyMapperResponse
         );
       });
-});
+    });
 
+    it("should return 200 Ok with an object returned by domain to presentation mapper", async () => {
+      // arrange
+      const dummyUsecaseResponse = {
+        prop1: "abc",
+        prop2: 78,
+      };
+
+      mockMapper.domainToPresentationGet.mockResolvedValue(
+        dummyUsecaseResponse
+      );
+      const endpoint = classUnderTest.get();
+
+      const expectedResponse = {
+        statusCode: 200,
+        body: JSON.stringify(dummyUsecaseResponse),
+      };
+
+      // act
+      const endpointResponse = await endpoint(
+        {
+          body: null,
+          pathParameters: {
+            id: "123",
+          },
+        },
+        {}
+      );
+
+      // assert
+      expect(endpointResponse).toStrictEqual(expectedResponse);
     });
   });
+});
+
+// const dummyMapperResponse = {
+//   prop1: "abc",
+//   prop2: 78,
+// };
+
+// mockMapper.toDomain.mockReturnValue(dummyMapperResponse);
+
+// const expectedResponse = {
+//   statusCode: 201,
+// };
+
+// // act
+// const endpointResponse = await endpoint(event, context);
