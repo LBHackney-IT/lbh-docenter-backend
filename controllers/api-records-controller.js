@@ -127,11 +127,15 @@ SyntaxError: Unexpected token u in JSON at position 0
       validators: [
         {
           name: "API id",
-          failureMessage: "Please provide a non-emptendpointResponsey API id.",
+          failureMessage: "Please provide a non-empty API id.",
           validate: (inputObj) => nonEmpty(inputObj?.id),
         },
       ],
-      implementation: async (event, context) => {},
+      implementation: async (event, context) => {
+        await this._apiRecordsPDMapper.presentationToDomainGet(
+          event.pathParameters
+        );
+      },
     });
   }
 }

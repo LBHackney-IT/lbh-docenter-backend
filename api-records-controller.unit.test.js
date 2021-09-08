@@ -393,6 +393,27 @@ describe("API Records Controller", () => {
       // assert
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
+
+    it("should return a function that calls the presentation to domain mapper with the input event path parameters", async () => {
+      // arrange
+      const event = {
+        pathParameters: { id: _faker.datatype.number().toString() },
+        body: null,
+      };
+      const context = {};
+
+      const endpoint = classUnderTest.get();
+
+      // act
+      await endpoint(event, context);
+
+      // assert
+      // expect(JSON.parse(endpointResponse)).toStrictEqual(expectedResponse);
+      expect(mockMapper.presentationToDomainGet).toHaveBeenCalledTimes(1);
+      expect(mockMapper.presentationToDomainGet).toHaveBeenCalledWith(
+        event.pathParameters
+      );
+    });
 });
 
   });
