@@ -22,7 +22,8 @@ class APIRecordUseCase {
 
   async executeGet(domainBoundary) {
     const dataBoundary = await this._domainDataMapper.toDataGet(domainBoundary);
-    await this._apiRecordGateway.executeGet(dataBoundary);
+    const gatewayResult = await this._apiRecordGateway.executeGet(dataBoundary);
+    await this._domainDataMapper.toDomainGet(gatewayResult);
   }
 }
 

@@ -5,6 +5,7 @@ const { APIRecordUseCase } = require("./api-record-uc");
 const {
   DuplicateRecordException,
 } = require("../models/exceptions/duplicateRecordException");
+const { generateAPIRecord } = require("../helpers/tests/generators");
 
 describe("API Records Use Case", () => {
   let mockGateway, mockMapper, classUnderTest;
@@ -15,7 +16,11 @@ describe("API Records Use Case", () => {
       existsCheck: jest.fn(),
       executeGet: jest.fn(),
     };
-    mockMapper = { domainToData: jest.fn(), toDataGet: jest.fn() };
+    mockMapper = {
+      domainToData: jest.fn(),
+      toDataGet: jest.fn(),
+      toDomainGet: jest.fn(),
+    };
     classUnderTest = new APIRecordUseCase(mockGateway, mockMapper);
   });
 
@@ -25,6 +30,7 @@ describe("API Records Use Case", () => {
     mockGateway.executeGet.mockReset();
     mockMapper.domainToData.mockReset();
     mockMapper.toDataGet.mockReset();
+    mockMapper.toDomainGet.mockReset();
   });
 
   describe("Execute Post method", () => {
@@ -172,6 +178,19 @@ describe("API Records Use Case", () => {
       // assert
       expect(mockMapper.toDataGet).toHaveBeenCalledTimes(1);
       expect(mockMapper.toDataGet).toHaveBeenCalledWith(domainBoundary);
+    });
+
+    it("should call the mapper's toDomainGet method with dataBoundary returned by the gateway once", async () => {
+      // arrange
+      const gatewayResponse = generateAPIRecord();
+
+      mockGateway.executeGet.mockReturnValue(gatewayResponse);
+      // act
+      await classUnderTest.executeGet({});
+
+      // assert
+      expect(mockMapper.toDomainGet).toHaveBeenCalledTimes(1);
+      expect(mockMapper.toDomainGet).toHaveBeenCalledWith(gatewayResponse);
     });
   });
 });
