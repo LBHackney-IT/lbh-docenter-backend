@@ -14,16 +14,20 @@ describe("API Records Controller", () => {
   beforeAll(() => {
     mockMapper = {
       toDomain: jest.fn(),
+      presentationToDomainGet: jest.fn(),
     };
     mockUseCase = {
       executePost: jest.fn(),
+      executeGet: jest.fn(),
     };
     classUnderTest = new APIRecordsController(mockUseCase, mockMapper);
   });
 
   afterEach(() => {
     mockUseCase.executePost.mockReset();
+    mockUseCase.executeGet.mockReset();
     mockMapper.toDomain.mockReset();
+    mockMapper.presentationToDomainGet.mockReset();
   });
 
   xdescribe("Base endpoint method", () => {
@@ -413,6 +417,32 @@ describe("API Records Controller", () => {
       expect(mockMapper.presentationToDomainGet).toHaveBeenCalledWith(
         event.pathParameters
       );
+    });
+
+    it("should return a function that calls the use case with the the output of presentation to domain mapper", async () => {
+      // arrange
+      const event = { body: null, pathParameters: "kurwa" };
+      const context = {};
+      const dummyMapperResponse = {
+        prop3: "abc",
+        prop4: 7897987,
+      };
+
+      mockMapper.presentationToDomainGet.mockReturnValue(dummyMapperResponse);
+      mockUseCase.executeGet = jest.fn(); //.mockResolvedValue(42);
+
+      const endpoint = classUnderTest.get();
+      console.log(endpoint);
+
+      // act
+      // can't use the await here, because it won't do its job. it's because ether jest, or javascript was written by someone with less than 20 IQ
+      endpoint(event, context).then(() => {
+        // assert
+        expect(mockUseCase.executeGet).toHaveBeenCalledTimes(1);
+        expect(mockUseCase.executeGet).toHaveBeenCalledWith(
+          dummyMapperResponse
+        );
+      });
     });
 });
 
