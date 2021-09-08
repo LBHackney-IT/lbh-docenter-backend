@@ -22,6 +22,7 @@ describe("API Records Use Case", () => {
   afterEach(() => {
     mockGateway.executePost.mockReset();
     mockGateway.existsCheck.mockReset();
+    mockGateway.executeGet.mockReset();
     mockMapper.domainToData.mockReset();
     mockMapper.toDataGet.mockReset();
   });
@@ -146,6 +147,19 @@ describe("API Records Use Case", () => {
 
       // assert
       expect(mockGateway.executeGet).toHaveBeenCalledTimes(1);
+    });
+
+    it("should call the gateway's executeGet method with mapper's output", async () => {
+      // arrange
+      const domainBoundary = { id: _faker.datatype.string(5) };
+
+      mockMapper.toDataGet.mockReturnValue(domainBoundary);
+
+      // act
+      await classUnderTest.executeGet({});
+
+      // assert
+      expect(mockGateway.executeGet).toHaveBeenCalledWith(domainBoundary);
     });
 
     it("should call the mapper's toDataGet method with domainBoundary once", async () => {
