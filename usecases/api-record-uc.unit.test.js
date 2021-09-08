@@ -192,5 +192,17 @@ describe("API Records Use Case", () => {
       expect(mockMapper.toDomainGet).toHaveBeenCalledTimes(1);
       expect(mockMapper.toDomainGet).toHaveBeenCalledWith(gatewayResponse);
     });
+
+    it("should return the domainBoundary outputed by the toDomainGet mapper's method.", async () => {
+      // arrange
+      const expectedResult = generateAPIRecord(); // simplistic case, so same structure accross layers
+
+      mockMapper.toDomainGet.mockReturnValue(expectedResult);
+      // act
+      const actualResult = await classUnderTest.executeGet({});
+
+      // assert
+      expect(actualResult).toBe(expectedResult);
+    });
   });
 });
