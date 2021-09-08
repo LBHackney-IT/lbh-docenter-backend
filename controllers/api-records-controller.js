@@ -3,6 +3,9 @@ const { nonEmpty } = require("../helpers/actual/validation");
 const {
   DuplicateRecordException,
 } = require("../models/exceptions/duplicateRecordException");
+const {
+  RecordNotFoundException,
+} = require("../models/exceptions/recordNotFoundException");
 
 class APIRecordsController {
   constructor(apiRecordUseCase, apiRecordsPDMapper) {
@@ -49,7 +52,16 @@ SyntaxError: Unexpected token u in JSON at position 0
       try {
         return await implementation(event, context);
       } catch (e) {
-        if (e instanceof DuplicateRecordException) {
+        // should probs turn it into switch case at some point
+        if (e instanceof RecordNotFoundException) {
+          return {
+            statusCode: 404,
+            body: JSON.stringify({
+              userMessage: e.message,
+              errorMessage: e.message,
+            }),
+          };
+        } else if (e instanceof DuplicateRecordException) {
           return {
             statusCode: 409,
             body: JSON.stringify({
