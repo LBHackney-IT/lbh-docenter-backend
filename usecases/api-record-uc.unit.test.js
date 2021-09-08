@@ -15,7 +15,7 @@ describe("API Records Use Case", () => {
       existsCheck: jest.fn(),
       executeGet: jest.fn(),
     };
-    mockMapper = { domainToData: jest.fn(), dataToDomain: jest.fn() };
+    mockMapper = { domainToData: jest.fn(), toDataGet: jest.fn() };
     classUnderTest = new APIRecordUseCase(mockGateway, mockMapper);
   });
 
@@ -23,6 +23,7 @@ describe("API Records Use Case", () => {
     mockGateway.executePost.mockReset();
     mockGateway.existsCheck.mockReset();
     mockMapper.domainToData.mockReset();
+    mockMapper.toDataGet.mockReset();
   });
 
   describe("Execute Post method", () => {
@@ -139,12 +140,24 @@ describe("API Records Use Case", () => {
   });
 
   describe("Execute Get method", () => {
-    it("should call the gateway Get method once", async () => {
+    it("should call the gateway's executeGet method once", async () => {
       // act
       await classUnderTest.executeGet({});
 
       // assert
       expect(mockGateway.executeGet).toHaveBeenCalledTimes(1);
+    });
+
+    it("should call the mapper's toDataGet method with domainBoundary once", async () => {
+      // arrange
+      const domainBoundary = { id: _faker.datatype.string(5) };
+
+      // act
+      await classUnderTest.executeGet(domainBoundary);
+
+      // assert
+      expect(mockMapper.toDataGet).toHaveBeenCalledTimes(1);
+      expect(mockMapper.toDataGet).toHaveBeenCalledWith(domainBoundary);
     });
   });
 });
