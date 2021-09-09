@@ -85,7 +85,7 @@ jobs:
           command: cat /etc/hosts
       - run:
           name: Create DynamoDB tables
-          command: ./local/initialiseDB.sh
+          command: sleep 20 && ./local/initialiseDB.sh
       - run:
           name: try calling the dynamo port
           command: sudo curl http://localhost:8000/ || echo skipping failure
