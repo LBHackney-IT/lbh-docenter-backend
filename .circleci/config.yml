@@ -1,6 +1,109 @@
-# version: 2.1
+version: 2.1
 
-# orbs:
-#   aws-ecr: circleci/aws-ecr@3.0.0
-#   aws-cli: circleci/aws-cli@0.1.9
-#   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
+orbs:
+  aws-ecr: circleci/aws-ecr@3.0.0
+  aws-cli: circleci/aws-cli@0.1.9
+  aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
+
+executors:
+  nodeenv:
+    docker:
+      - image: circleci/node:14.17.4
+  python:
+    docker:
+      - image: circleci/python:3.7
+
+references:
+  workspace_root: &workspace_root "~"
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+commands:
+  assume-role-and-persist-workspace:
+    description: "Assumes deployment role and persists credentials across jobs"
+    parameters:
+      aws-account:
+        type: string
+    steps:
+      - checkout
+      - aws_assume_role/assume_role:
+          account: <<parameters.aws-account>>
+          profile_name: default
+          role: "LBH_Circle_CI_Deployment_Role"
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .aws
+  deploy-lambda:
+    description: "Deploys API via Serverless"
+    parameters:
+      stage:
+        type: string
+      aws-account:
+        type: string
+    steps:
+      - *attach_workspace
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install serverless CLI
+          command: npm i -g serverless
+      - run:
+          name: Deploy lambda
+          command: |
+            cd ./BaseApi/
+            sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+
+jobs:
+  build-and-test:
+    executor: nodeenv
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+      - aws-cli/setup:
+          aws-access-key-id: irrelevant
+          aws-secret-access-key: alsoIrrelevant
+          aws-region: eu-west-2
+      - run:
+          name: Test test aws
+          command: aws --version
+      - run:
+          name: Create DynamoDB tables and seed the database
+          command: ./local/initialiseDB.sh
+      - run:
+          name: Run unit tests
+          command: yarn run unit
+
+  assume-role-development:
+    executor: nodeenv
+    steps:
+      - assume-role-and-persist-workspace:
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+  deploy-to-development:
+    executor: nodeenv
+    steps:
+      - deploy-lambda:
+          stage: "development"
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+
+workflows:
+  check-and-deploy-development:
+    jobs:
+      - check-code-formatting
+      - build-and-test
+      - assume-role-development:
+          context: api-assume-role-development-context
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: master
+      - deploy-to-development:
+          context: api-assume-role-development-context
+          filters:
+            branches:
+              only: master
