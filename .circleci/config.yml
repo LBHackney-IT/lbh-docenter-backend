@@ -69,10 +69,10 @@ jobs:
           aws-secret-access-key: FAKE_SECRET_ACCESS_KEY
           aws-region: FAKE_AWS_REGION
       - run:
-          name: Test test aws
-          command: aws --version
+          name: Spin-up Local Dynamo
+          command: make dynamo
       - run:
-          name: Create DynamoDB tables and seed the database
+          name: Create DynamoDB tables
           command: ./local/initialiseDB.sh
       - run:
           name: Run unit tests
