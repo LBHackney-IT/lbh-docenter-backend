@@ -83,7 +83,6 @@ jobs:
       - run:
           name: check whether localhost is registered
           command: cat /etc/hosts
-#           sudo lsof -i -P -n | grep LISTEN
       - run:
           name: Create DynamoDB tables
           command: ./local/initialiseDB.sh
@@ -93,6 +92,9 @@ jobs:
       - run:
           name: check whether localhost is registered
           command: sudo lsof -i:8000 || sudo netstat -tulpn | grep LISTEN
+      - run:
+          name: is container still running?
+          command: docker ps
       - run:
           name: Run unit tests
           command: yarn run unit
