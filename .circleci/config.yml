@@ -79,7 +79,7 @@ jobs:
           command: docker ps -a
       - run:
           name: Create DynamoDB tables
-          command: sleep 10 && ./local/initialiseDB.sh
+          command: docker ps && ./local/initialiseDB.sh
       - run:
           name: Run unit tests
           command: yarn run unit
