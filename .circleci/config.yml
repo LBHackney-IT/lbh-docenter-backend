@@ -78,8 +78,17 @@ jobs:
           name: Why couldn't the script connect?
           command: docker ps -a
       - run:
+          name: Deps
+          command: sudo apt -y install curl lsof
+      - run:
+          name: check ports
+          command: sudo lsof -i -P -n | grep LISTEN
+      - run:
           name: Create DynamoDB tables
-          command: sudo lsof -i -P -n | grep LISTEN && ./local/initialiseDB.sh
+          command: ./local/initialiseDB.sh
+      - run:
+          name: try calling the dynamo port
+          command: curl http://localhost:8000/
       - run:
           name: Run unit tests
           command: yarn run unit
