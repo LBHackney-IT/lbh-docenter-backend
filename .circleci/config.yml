@@ -81,14 +81,18 @@ jobs:
           name: Deps
           command: sudo apt -y install curl lsof
       - run:
-          name: check ports
-          command: sudo lsof -i -P -n | grep LISTEN
+          name: check whether localhost is registered
+          command: cat /etc/hosts
+#           sudo lsof -i -P -n | grep LISTEN
       - run:
           name: Create DynamoDB tables
           command: ./local/initialiseDB.sh
       - run:
           name: try calling the dynamo port
           command: curl http://localhost:8000/
+      - run:
+          name: check whether localhost is registered
+          command: sudo lsof -i:8000 || sudo netstat -tulpn | grep LISTEN
       - run:
           name: Run unit tests
           command: yarn run unit
