@@ -89,7 +89,7 @@ jobs:
           command: ./local/initialiseDB.sh
       - run:
           name: try calling the dynamo port
-          command: curl http://localhost:8000/
+          command: sudo curl http://localhost:8000/ || echo skipping failure
       - run:
           name: check whether localhost is registered
           command: sudo lsof -i:8000 || sudo netstat -tulpn | grep LISTEN
