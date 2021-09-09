@@ -2,13 +2,14 @@ version: 2.1
 
 orbs:
   aws-ecr: circleci/aws-ecr@3.0.0
-  aws-cli: circleci/aws-cli@0.1.9
+  aws-cli: circleci/aws-cli@1.0.0
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
 
 executors:
   nodeenv:
     docker:
       - image: circleci/node:14.17.4
+      - image: amazon/dynamodb-local
   python:
     docker:
       - image: circleci/python:3.7
@@ -52,27 +53,26 @@ commands:
       - run:
           name: Deploy lambda
           command: |
-            cd ./BaseApi/
             sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
-
 jobs:
   build-and-test:
     executor: nodeenv
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker
+      - run:
+          name: Check whether container is running
+          command: docker ps
       - run:
           name: Install dependencies
           command: yarn install --frozen-lockfile
       - aws-cli/setup:
-          aws-access-key-id: irrelevant
-          aws-secret-access-key: alsoIrrelevant
-          aws-region: eu-west-2
+          aws-access-key-id: FAKE_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: FAKE_SECRET_ACCESS_KEY
+          aws-region: FAKE_AWS_REGION
       - run:
-          name: Test test aws
-          command: aws --version
-      - run:
-          name: Create DynamoDB tables and seed the database
+          name: Create DynamoDB tables
           command: ./local/initialiseDB.sh
       - run:
           name: Run unit tests
@@ -93,7 +93,6 @@ jobs:
 workflows:
   check-and-deploy-development:
     jobs:
-      - check-code-formatting
       - build-and-test
       - assume-role-development:
           context: api-assume-role-development-context
