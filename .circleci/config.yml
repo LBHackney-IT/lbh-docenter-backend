@@ -73,7 +73,7 @@ jobs:
           command: docker pull amazon/dynamodb-local
       - run:
           name: Spin-up Local Dynamo
-          command: make dynamo &
+          command: nohop make dynamo
       - run:
           name: Why couldn't the script connect?
           command: docker ps -a
