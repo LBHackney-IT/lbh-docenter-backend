@@ -65,9 +65,9 @@ jobs:
           name: Install dependencies
           command: yarn install --frozen-lockfile
       - aws-cli/setup:
-          aws-access-key-id: irrelevant
-          aws-secret-access-key: alsoIrrelevant
-          aws-region: eu-west-2
+          aws-access-key-id: FAKE_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: FAKE_AWS_SECRET_ACCESS_KEY
+          aws-region: FAKE_AWS_REGION
       - run:
           name: Test test aws
           command: aws --version
