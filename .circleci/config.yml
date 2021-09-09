@@ -73,10 +73,13 @@ jobs:
           command: docker pull amazon/dynamodb-local
       - run:
           name: Spin-up Local Dynamo
-          command: make dynamo & sleep 10
+          command: make dynamo &
+      - run:
+          name: Why couldn't the script connect?
+          command: docker ps -a
       - run:
           name: Create DynamoDB tables
-          command: ./local/initialiseDB.sh
+          command: sleep 10 && ./local/initialiseDB.sh
       - run:
           name: Run unit tests
           command: yarn run unit
