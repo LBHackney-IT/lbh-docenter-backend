@@ -100,9 +100,9 @@ workflows:
             - build-and-test
           filters:
             branches:
-              only: master
+              only: deploy-test
       - deploy-to-development:
           context: api-assume-role-development-context
           filters:
             branches:
-              only: master
+              only: deploy-test
