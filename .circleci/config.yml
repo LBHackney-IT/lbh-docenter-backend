@@ -78,31 +78,31 @@ jobs:
           name: Run unit tests
           command: yarn run unit
 
-  assume-role-development:
+  assume-role-staging:
     executor: python
     steps:
       - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
-  deploy-to-development:
+          aws-account: $AWS_ACCOUNT_STAGING
+  deploy-to-staging:
     executor: aws-cli/default
     steps:
       - deploy-lambda:
           stage: "development"
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          aws-account: $AWS_ACCOUNT_STAGING
 
 workflows:
   check-and-deploy-development:
     jobs:
       - build-and-test
       - assume-role-development:
-          context: api-assume-role-development-context
+          context: api-assume-role-staging-context
           requires:
             - build-and-test
           filters:
             branches:
               only: deploy-test
-      - deploy-to-development:
-          context: api-assume-role-development-context
+      - deploy-to-staging:
+          context: api-assume-role-staging-context
           filters:
             branches:
               only: deploy-test
