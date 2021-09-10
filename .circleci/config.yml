@@ -48,9 +48,19 @@ commands:
       - checkout
       - setup_remote_docker
       - run:
-          name: Deploy lambda
+          name: Install Node.js
           command: |
-            sudo yarn add global serverless && sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+            curl -sL https://deb.nodesource.com/setup_13.x | bash -
+            apt-get update && apt-get install -y nodejs
+      - run:
+          name: Install Yarn
+          command: npm install --global yarn
+      - run:
+          name: Install Serverless
+          command: sudo yarn add global serverless
+      - run:
+          name: Deploy lambda
+          command: serverless deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
 jobs:
   build-and-test:
     executor: nodeenv
