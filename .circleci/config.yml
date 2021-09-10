@@ -52,7 +52,7 @@ commands:
           command: sudo npm i -g serverless
       - run:
           name: Deploy lambda
-          command: sudo yarn --frozen-lockfile --production=true && sudo npm i -g serverless && sudo sls deploy --stage staging
+          command: sudo yarn --frozen-lockfile && sudo npm i -g serverless && sudo sls deploy --stage staging
 jobs:
   build-and-test:
     executor: nodeenv
