@@ -47,12 +47,15 @@ commands:
       - *attach_workspace
       - checkout
       - setup_remote_docker
+#       - run:
+#           name: Install Serverless
+#           command: sudo yarn add global serverless
       - run:
-          name: Install Serverless
-          command: sudo yarn add global serverless
+          name: Install serverless CLI
+          command: npm i -g serverless
       - run:
           name: Deploy lambda
-          command: serverless deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+          command: sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
 jobs:
   build-and-test:
     executor: nodeenv
