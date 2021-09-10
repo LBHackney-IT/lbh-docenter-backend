@@ -84,7 +84,7 @@ jobs:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_DEVELOPMENT
   deploy-to-development:
-    executor: python
+    executor: aws-cli/default
     steps:
       - deploy-lambda:
           stage: "development"
