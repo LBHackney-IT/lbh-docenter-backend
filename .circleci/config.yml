@@ -10,9 +10,6 @@ executors:
     docker:
       - image: circleci/node:14.17.4
       - image: amazon/dynamodb-local
-  python:
-    docker:
-      - image: circleci/python:3.7
 
 references:
   workspace_root: &workspace_root "~"
