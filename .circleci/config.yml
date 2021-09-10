@@ -10,6 +10,9 @@ executors:
     docker:
       - image: circleci/node:14.17.4
       - image: amazon/dynamodb-local
+  python:
+    docker:
+      - image: circleci/python:3.7
 
 references:
   workspace_root: &workspace_root "~"
@@ -76,12 +79,12 @@ jobs:
           command: yarn run unit
 
   assume-role-development:
-    executor: nodeenv
+    executor: python
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_DEVELOPMENT
   deploy-to-development:
-    executor: nodeenv
+    executor: python
     steps:
       - deploy-lambda:
           stage: "development"
