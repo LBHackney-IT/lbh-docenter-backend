@@ -76,9 +76,6 @@ functions:
   hello:
     name: ${self:service}-hello-${self:provider.stage}
     handler: handler.hello
-    vpc:
-      securityGroupIds: ${self:custom.securityGroups.${self:provider.stage}}
-      subnetIds: ${self:custom.subnets.${self:provider.stage}}
     events:
       - http:
           path: /v1/hello
@@ -86,9 +83,6 @@ functions:
   createAPI:
     name: ${self:service}-createAPI-${self:provider.stage}
     handler: handler.createAPI
-    vpc:
-      securityGroupIds: ${self:custom.securityGroups.${self:provider.stage}}
-      subnetIds: ${self:custom.subnets.${self:provider.stage}}
     events:
       - http:
           path: /v1/apis
@@ -96,9 +90,6 @@ functions:
   listAPIs:
     name: ${self:service}-listAPIs-${self:provider.stage}
     handler: handler.listAPIs
-    vpc:
-      securityGroupIds: ${self:custom.securityGroups.${self:provider.stage}}
-      subnetIds: ${self:custom.subnets.${self:provider.stage}}
     events:
       - http:
           path: /v1/apis
@@ -106,9 +97,6 @@ functions:
   getAPI:
     name: ${self:service}-getAPI-${self:provider.stage}
     handler: handler.getAPI
-    vpc:
-      securityGroupIds: ${self:custom.securityGroups.${self:provider.stage}}
-      subnetIds: ${self:custom.subnets.${self:provider.stage}}
     events:
       - http:
           path: /v1/apis/{id}
@@ -116,9 +104,6 @@ functions:
   patchAPI:
     name: ${self:service}-patchAPI-${self:provider.stage}
     handler: handler.patchAPI
-    vpc:
-      securityGroupIds: ${self:custom.securityGroups.${self:provider.stage}}
-      subnetIds: ${self:custom.subnets.${self:provider.stage}}
     events:
       - http:
           path: /v1/apis/{id}
@@ -177,24 +162,12 @@ resources:
           - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+
 custom:
-  securityGroups:
+  vpc:
     staging:
-      - sg-0166cbf56b7e77af0
-    production:
-      - sg-04b71cc889c5790e7
-  subnets:
-    staging:
-      - subnet-06d3de1bd9181b0d7
-      - subnet-0ed7d7713d1127656
-    production:
-      - subnet-0b7b8fea07efabf34
-      - subnet-01d3657f97a243261
+      securityGroupIds:
+        - sg-04fa13c6d25c5f5cc
+      subnetIds:
+        - subnet-0ed7d7713d1127656
+        - subnet-06d3de1bd9181b0d7
