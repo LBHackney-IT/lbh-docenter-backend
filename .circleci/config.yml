@@ -50,7 +50,7 @@ commands:
       - run:
           name: Deploy lambda
           command: |
-            yarn --frozen-lockfile --production=true && sudo yarn add global serverless && sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+            sudo yarn add global serverless && sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
 jobs:
   build-and-test:
     executor: nodeenv
