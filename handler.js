@@ -1,4 +1,6 @@
 "use strict";
+console.log("We hit this point!!!!!!!!!!!\n\n\n\n\n\\n\n\n\n\n");
+
 const AWS = require("aws-sdk");
 const { APIRecordsGateway } = require("./gateways/api-records-gw");
 const { APIRecordUseCase } = require("./usecases/api-record-uc");
