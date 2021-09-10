@@ -54,13 +54,9 @@ commands:
 jobs:
   build-and-test:
     executor: nodeenv
-    working_directory: ~/repo
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Check whether container is running
-          command: docker ps
       - run:
           name: Install dependencies
           command: yarn install --frozen-lockfile
