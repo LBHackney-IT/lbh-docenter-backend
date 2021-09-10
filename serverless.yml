@@ -24,6 +24,8 @@ provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
+  stage: ${opt:stage}
+  region: eu-west-2
 
   # you can overwrite defaults here
   #  stage: dev
@@ -38,7 +40,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis-${opt:stage}
+      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis${self:provider.stage}
   #        - "s3:ListBucket"
   #      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
   #    - Effect: "Allow"
@@ -53,7 +55,7 @@ provider:
 
   # you can define service wide environment variables here
   environment:
-    DYNAMODB_APIS_TABLE: ${self:service}-apis-${opt:stage}
+    DYNAMODB_APIS_TABLE: ${self:service}-apis-${self:provider.stage}
 
 # you can add packaging information here
 #package:
@@ -69,30 +71,35 @@ plugins:
 
 functions:
   hello:
+    name: ${self:service}-hello-${self:provider.stage}
     handler: handler.hello
     events:
       - http:
           path: /v1/hello
           method: get
   createAPI:
+    name: ${self:service}-createAPI-${self:provider.stage}
     handler: handler.createAPI
     events:
       - http:
           path: /v1/apis
           method: post
   listAPIs:
+    name: ${self:service}-listAPIs-${self:provider.stage}
     handler: handler.listAPIs
     events:
       - http:
           path: /v1/apis
           method: get
   getAPI:
+    name: ${self:service}-getAPI-${self:provider.stage}
     handler: handler.getAPI
     events:
       - http:
           path: /v1/apis/{id}
           method: get
   patchAPI:
+    name: ${self:service}-patchAPI-${self:provider.stage}
     handler: handler.patchAPI
     events:
       - http:
