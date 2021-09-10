@@ -1,7 +1,6 @@
 version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@3.0.0
   aws-cli: circleci/aws-cli@1.0.0
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
 
@@ -10,6 +9,9 @@ executors:
     docker:
       - image: circleci/node:14.17.4
       - image: amazon/dynamodb-local
+  python:
+    docker:
+      - image: circleci/python:3.7
 
 references:
   workspace_root: &workspace_root "~"
@@ -46,21 +48,16 @@ commands:
       - setup_remote_docker
       - run:
           name: Install serverless CLI
-          command: npm i -g serverless
+          command: sudo npm i -g serverless
       - run:
           name: Deploy lambda
-          command: |
-            sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+          command: sudo yarn --frozen-lockfile && sls deploy --stage staging
 jobs:
   build-and-test:
     executor: nodeenv
-    working_directory: ~/repo
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Check whether container is running
-          command: docker ps
       - run:
           name: Install dependencies
           command: yarn install --frozen-lockfile
@@ -75,31 +72,32 @@ jobs:
           name: Run unit tests
           command: yarn run unit
 
-  assume-role-development:
-    executor: nodeenv
+  assume-role-staging:
+    executor: python
     steps:
       - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
-  deploy-to-development:
+          aws-account: $AWS_ACCOUNT_STAGING
+  deploy-to-staging:
     executor: nodeenv
     steps:
       - deploy-lambda:
-          stage: "development"
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          stage: "staging"
+          aws-account: $AWS_ACCOUNT_STAGING
 
 workflows:
-  check-and-deploy-development:
+  check-and-deploy-staging:
     jobs:
       - build-and-test
-      - assume-role-development:
-          context: api-assume-role-development-context
+      - assume-role-staging:
+          context: api-assume-role-staging-context
           requires:
             - build-and-test
           filters:
             branches:
               only: master
-      - deploy-to-development:
-          context: api-assume-role-development-context
+      - deploy-to-staging:
+          requires:
+            - assume-role-staging
           filters:
             branches:
               only: master

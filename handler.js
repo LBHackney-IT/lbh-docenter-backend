@@ -1,5 +1,5 @@
 "use strict";
-const AWS = require("aws-sdk");
+
 const { APIRecordsGateway } = require("./gateways/api-records-gw");
 const { APIRecordUseCase } = require("./usecases/api-record-uc");
 const { PresentationDomainMapper } = require("./mappers/api-record-pd-mapper");
@@ -7,13 +7,13 @@ const { dynamodbClient } = require("./database-contexts/dynamodb");
 const {
   APIRecordsController,
 } = require("./controllers/api-records-controller");
+
 const gateway = new APIRecordsGateway(dynamodbClient);
 const pdMapper = new PresentationDomainMapper();
 pdMapper["presentationToDomainGet"] = (userInput) => {
   return { id: userInput.id };
 };
 pdMapper["domainToPresentationGet"] = pdMapper["toDomain"];
-
 const dmMapper = new PresentationDomainMapper();
 dmMapper["domainToData"] = dmMapper["toDomain"];
 delete dmMapper["toDomain"];
