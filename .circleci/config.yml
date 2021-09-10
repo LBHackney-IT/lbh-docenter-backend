@@ -52,7 +52,7 @@ commands:
 #           command: sudo yarn add global serverless
       - run:
           name: Install serverless CLI
-          command: npm i -g serverless
+          command: sudo npm i -g serverless
       - run:
           name: Deploy lambda
           command: sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
