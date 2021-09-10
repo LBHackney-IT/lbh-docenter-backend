@@ -5,6 +5,9 @@ const {
 } = require("../helpers/tests/dynamoOps");
 const { APIRecordsGateway } = require("./api-records-gw");
 const { DynamoDBException } = require("../models/exceptions/dynamoException");
+const {
+  RecordNotFoundException,
+} = require("../models/exceptions/recordNotFoundException");
 const { dynamodbClient } = require("../database-contexts/dynamodb");
 const _faker = require("faker");
 
@@ -94,6 +97,62 @@ describe("API Records Gateway", () => {
 
       // assert
       await expect(actualResult).toEqual(expectedResult);
+    });
+  });
+
+  describe("Execute Get method", () => {
+    it("should retrieve a record with a matching id when it exists", async () => {
+      // arrange
+      const searchDataBoundary = {
+        id: _faker.datatype.string(8),
+      };
+
+      const expectedItem = {
+        id: searchDataBoundary.id,
+        name: _faker.datatype.string(5),
+      };
+
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: expectedItem,
+        })
+        .promise();
+
+      // act
+      const actualResult = await classUnderTest.executeGet(searchDataBoundary);
+
+      // assert
+      expect(actualResult).toStrictEqual(expectedItem);
+    });
+
+    it("should throw a Record Not Found exception when no record matching given id is found", async () => {
+      // arrange
+      const searchDataBoundary = {
+        id: _faker.datatype.string(8),
+      };
+
+      const nonMatchingItem = {
+        id: _faker.datatype.string(8),
+        name: _faker.datatype.string(5),
+      };
+
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: nonMatchingItem,
+        })
+        .promise();
+
+      const expectedException = new RecordNotFoundException(
+        `Record with id: ${searchDataBoundary.id} was not found.`
+      );
+
+      // act
+      const testDelegate = () => classUnderTest.executeGet(searchDataBoundary);
+
+      // assert
+      await expect(testDelegate).rejects.toThrow(expectedException.message);
     });
   });
 });

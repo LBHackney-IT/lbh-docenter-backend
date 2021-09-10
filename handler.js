@@ -9,9 +9,26 @@ const {
 } = require("./controllers/api-records-controller");
 const gateway = new APIRecordsGateway(dynamodbClient);
 const pdMapper = new PresentationDomainMapper();
+pdMapper["presentationToDomainGet"] = (userInput) => {
+  return { id: userInput.id };
+};
+pdMapper["domainToPresentationGet"] = pdMapper["toDomain"];
+
 const dmMapper = new PresentationDomainMapper();
 dmMapper["domainToData"] = dmMapper["toDomain"];
 delete dmMapper["toDomain"];
+dmMapper["toDataGet"] = (userInput) => {
+  return { id: userInput.id };
+};
+dmMapper["toDomainGet"] = dmMapper["domainToData"];
+
+// TODO: make mapper resilient to missing fields:
+// cannot access "apis" of undefined
+
+// mockMapper.presentationToDomainGet.mockReset();
+// mockMapper.domainToPresentationGet.mockReset();
+// mockMapper.toDataGet.mockReset();
+// mockMapper.toDomainGet.mockReset();
 
 const usecase = new APIRecordUseCase(gateway, dmMapper);
 const controller = new APIRecordsController(usecase, pdMapper);
@@ -30,37 +47,12 @@ module.exports = {
       ),
     };
   },
+  // TODO Fix record creation error, where only 3 fields get added to the DB in gateway
   createAPI: controller.create(),
   listAPIs: async (event, context) => {
     return { statusCode: 501 };
   },
-  getAPI: async (event, context) => {
-    let getResult = {};
-    try {
-      let dynamodb = new AWS.DynamoDB.DocumentClient(options);
-      getResult = await dynamodb
-        .scan({
-          TableName: "api-records",
-          FilterExpression: "#gId = :gId",
-          ExpressionAttributeNames: { "#gId": "githubId" },
-          ExpressionAttributeValues: {
-            ":gId": parseInt(event.pathParameters.id),
-          },
-        })
-        .promise();
-    } catch (getError) {
-      console.log("There was a problem creating an API record.\n", getError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ getError: getError.message }),
-        headers: { "Content-Type": "application/json" },
-      };
-    }
-    if (getResult.Item === null) {
-      return { statusCode: 404 };
-    }
-    return { statusCode: 200, body: JSON.stringify(getResult.Items) };
-  },
+  getAPI: controller.get(),
   patchAPI: async (event, context) => {
     return { statusCode: 501 };
   },

@@ -1,4 +1,7 @@
 const { DynamoDBException } = require("../models/exceptions/dynamoException");
+const {
+  RecordNotFoundException,
+} = require("../models/exceptions/recordNotFoundException");
 
 class APIRecordsGateway {
   constructor(databaseContext) {
@@ -43,6 +46,24 @@ class APIRecordsGateway {
       console.log("Create parameters: ", createParams);
       throw new DynamoDBException(createError);
     }
+  }
+
+  async executeGet(dataBoundary) {
+    const apiRecord = await this._databaseContext
+      .get({
+        TableName: process.env.DYNAMODB_APIS_TABLE,
+        Key: {
+          id: dataBoundary.id,
+        },
+      })
+      .promise();
+
+    if (!apiRecord.Item)
+      throw new RecordNotFoundException(
+        `Record with id: ${dataBoundary.id} was not found.`
+      );
+
+    return apiRecord.Item;
   }
 }
 

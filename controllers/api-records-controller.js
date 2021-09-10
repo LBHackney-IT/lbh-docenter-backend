@@ -3,6 +3,9 @@ const { nonEmpty } = require("../helpers/actual/validation");
 const {
   DuplicateRecordException,
 } = require("../models/exceptions/duplicateRecordException");
+const {
+  RecordNotFoundException,
+} = require("../models/exceptions/recordNotFoundException");
 
 class APIRecordsController {
   constructor(apiRecordUseCase, apiRecordsPDMapper) {
@@ -16,6 +19,16 @@ class APIRecordsController {
       // Add test for baseEndpoint parsing event.body
       // from typeof string to typeof object
       // should equal to self deparsed
+
+      /*
+TODO: test this case when body is null
+SyntaxError: Unexpected token u in JSON at position 0
+        at JSON.parse (<anonymous>)
+
+      17 |       // from typeof string to typeof object
+      18 |       // should equal to self deparsed
+    > 19 |       const payload = JSON.parse(event.body);
+      */
       const payload = JSON.parse(event.body);
       event.body = payload;
       const validationErrors = validators
@@ -39,7 +52,16 @@ class APIRecordsController {
       try {
         return await implementation(event, context);
       } catch (e) {
-        if (e instanceof DuplicateRecordException) {
+        // should probs turn it into switch case at some point
+        if (e instanceof RecordNotFoundException) {
+          return {
+            statusCode: 404,
+            body: JSON.stringify({
+              userMessage: e.message,
+              errorMessage: e.message,
+            }),
+          };
+        } else if (e instanceof DuplicateRecordException) {
           return {
             statusCode: 409,
             body: JSON.stringify({
@@ -107,6 +129,32 @@ class APIRecordsController {
         await this._apiRecordUseCase.executePost(domainBoundary);
         return {
           statusCode: 201,
+        };
+      },
+    });
+  }
+
+  get() {
+    return this.baseEndpoint({
+      validators: [
+        {
+          name: "API id",
+          failureMessage: "Please provide a non-empty API id.",
+          validate: (inputObj) => nonEmpty(inputObj?.id),
+        },
+      ],
+      implementation: async (event, context) => {
+        const domainBoundary = this._apiRecordsPDMapper.presentationToDomainGet(
+          event.pathParameters
+        );
+        const usecaseResult = await this._apiRecordUseCase.executeGet(
+          domainBoundary
+        );
+        const presentationBoundary =
+          await this._apiRecordsPDMapper.domainToPresentationGet(usecaseResult);
+        return {
+          statusCode: 200,
+          body: JSON.stringify(presentationBoundary),
         };
       },
     });
