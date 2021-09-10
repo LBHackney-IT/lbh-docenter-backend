@@ -87,14 +87,14 @@ jobs:
     executor: aws-cli/default
     steps:
       - deploy-lambda:
-          stage: "development"
+          stage: "staging"
           aws-account: $AWS_ACCOUNT_STAGING
 
 workflows:
-  check-and-deploy-development:
+  check-and-deploy-staging:
     jobs:
       - build-and-test
-      - assume-role-development:
+      - assume-role-staging:
           context: api-assume-role-staging-context
           requires:
             - build-and-test
