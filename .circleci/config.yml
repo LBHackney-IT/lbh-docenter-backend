@@ -105,7 +105,8 @@ workflows:
             branches:
               only: deploy-test
       - deploy-to-staging:
-          context: api-assume-role-staging-context
+          requires:
+            - build-and-test
           filters:
             branches:
               only: deploy-test
