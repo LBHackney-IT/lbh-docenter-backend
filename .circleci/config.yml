@@ -55,7 +55,7 @@ commands:
           command: sudo npm i -g serverless
       - run:
           name: Deploy lambda
-          command: sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
+          command: yarn && sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
 jobs:
   build-and-test:
     executor: nodeenv
