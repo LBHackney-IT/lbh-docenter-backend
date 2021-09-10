@@ -20,15 +20,15 @@ provider:
           burstLimit: 200
           rateLimit: 100
 
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:Scan*
-        - dynamodb:GetItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis${self:provider.stage}
+#   iamRoleStatements:
+#     - Effect: "Allow"
+#       Action:
+#         - dynamodb:PutItem
+#         - dynamodb:Scan*
+#         - dynamodb:GetItem
+#         - dynamodb:UpdateItem
+#         - dynamodb:DeleteItem
+#       Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis${self:provider.stage}
 
   environment:
     DYNAMODB_APIS_TABLE: ${self:service}-apis-${self:provider.stage}
@@ -133,7 +133,8 @@ resources:
                     - "dynamodb:Query"
                     - "dynamodb:Scan"
                     - "dynamodb:UpdateItem"
-                  Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis${self:provider.stage}  
+                  Resource: 
+                    - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-apis-${self:provider.stage}
 #                   Resource:
 #                     - 'Fn::Join':
 #                         - ':'
