@@ -48,14 +48,6 @@ commands:
       - checkout
       - setup_remote_docker
       - run:
-          name: Install Node.js
-          command: |
-            curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
-            sudo apt-get update && sudo apt-get install -y nodejs
-#       - run:
-#           name: Install Yarn
-#           command: sudo npm install --global yarn
-      - run:
           name: Install Serverless
           command: sudo yarn add global serverless
       - run:
@@ -87,7 +79,7 @@ jobs:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_STAGING
   deploy-to-staging:
-    executor: aws-cli/default
+    executor: nodeenv
     steps:
       - deploy-lambda:
           stage: "staging"
