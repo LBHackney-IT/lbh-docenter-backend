@@ -48,9 +48,6 @@ commands:
       - checkout
       - setup_remote_docker
       - run:
-          name: Install serverless CLI
-          command: sudo npm i -g serverless
-      - run:
           name: Deploy lambda
           command: |
             yarn --frozen-lockfile --production=true && sudo yarn add global serverless && sls deploy --stage <<parameters.stage>> --account <<parameters.aws-account>> --conceal
