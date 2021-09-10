@@ -54,7 +54,7 @@ commands:
             sudo apt-get update && sudo apt-get install -y nodejs
       - run:
           name: Install Yarn
-          command: npm install --global yarn
+          command: sudo npm install --global yarn
       - run:
           name: Install Serverless
           command: sudo yarn add global serverless
