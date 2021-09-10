@@ -9,6 +9,9 @@ const { dynamodbClient } = require("./database-contexts/dynamodb");
 const {
   APIRecordsController,
 } = require("./controllers/api-records-controller");
+
+console.log("passed the imports\n\n\n\n");
+
 const gateway = new APIRecordsGateway(dynamodbClient);
 const pdMapper = new PresentationDomainMapper();
 pdMapper["presentationToDomainGet"] = (userInput) => {
@@ -35,8 +38,13 @@ dmMapper["toDomainGet"] = dmMapper["domainToData"];
 const usecase = new APIRecordUseCase(gateway, dmMapper);
 const controller = new APIRecordsController(usecase, pdMapper);
 
+console.log("passed injection\n\n\n\n\n");
+
 module.exports = {
   hello: async (event) => {
+    console.log("Inside the hello!\n\n\n\n\n\n");
+    console.log(event);
+    console.log("Returning!\n\n\n\n\n\n");
     return {
       statusCode: 200,
       body: JSON.stringify(
