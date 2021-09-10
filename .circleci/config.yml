@@ -106,7 +106,7 @@ workflows:
               only: deploy-test
       - deploy-to-staging:
           requires:
-            - build-and-test
+            - assume-role-staging
           filters:
             branches:
               only: deploy-test
