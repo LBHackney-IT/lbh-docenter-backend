@@ -32,11 +32,7 @@ class APIRecordsGateway {
       TableName: process.env.DYNAMODB_APIS_TABLE,
       // should do parsing elsewhere
       // also we're way past validation stage here, hence the ?.
-      Item: {
-        id: dataBoundary?.id,
-        name: dataBoundary?.name,
-        baseUrl: dataBoundary?.baseUrl,
-      },
+      Item: dataBoundary,
     };
 
     try {
