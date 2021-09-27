@@ -50,6 +50,9 @@ commands:
           name: Install serverless CLI
           command: sudo npm i -g serverless
       - run:
+          name: utils
+          command: sudo apt-get install -y util-linux
+      - run:
           name: Deploy lambda
           command: sudo yarn --frozen-lockfile && \
                    script -q --flush --return ./backDeployOutput.txt -c "sls deploy --stage staging" && \
