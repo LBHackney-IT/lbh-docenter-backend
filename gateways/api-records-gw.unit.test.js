@@ -8,6 +8,7 @@ const { DynamoDBException } = require("../models/exceptions/dynamoException");
 const {
   RecordNotFoundException,
 } = require("../models/exceptions/recordNotFoundException");
+const { generateAPIRecord } = require("../helpers/tests/generators");
 const { dynamodbClient } = require("../database-contexts/dynamodb");
 const _faker = require("faker");
 
@@ -15,34 +16,70 @@ describe("API Records Gateway", () => {
   let classUnderTest;
 
   beforeAll(() => {
-    classUnderTest = new APIRecordsGateway(dynamodbClient);
+    mockMapper = {
+      domainToData: jest.fn(),
+      toDataGet: jest.fn(),
+      toDomainGet: jest.fn(),
+    };
+    classUnderTest = new APIRecordsGateway(dynamodbClient, mockMapper);
   });
 
   afterEach(() => {
-    classUnderTest = new APIRecordsGateway(dynamodbClient);
+    mockMapper.domainToData.mockReset();
+    mockMapper.toDataGet.mockReset();
+    mockMapper.toDomainGet.mockReset();
+    classUnderTest = new APIRecordsGateway(dynamodbClient, mockMapper);
   });
 
   describe("Execute Post method", () => {
-    it("should insert only the provided API Record once", async () => {
+    it("should call the domainToData mapper method once", async () => {
+      try {
+        // act
+        await classUnderTest.executePost({});
+      } catch {
+        // assert
+        expect(mockMapper.domainToData).toHaveBeenCalledTimes(1);
+      }
+    });
+
+    it("should call the domainToData mapper method with the argument provided to GW", async () => {
+      // arrange
+      const gatewayArg = {
+        name: _faker.random.words(3),
+        baseUrl: _faker.internet.url(),
+      };
+
+      try {
+        // act
+        await classUnderTest.executePost(gatewayArg);
+      } catch {
+        // assert
+        expect(mockMapper.domainToData).toHaveBeenCalledWith(gatewayArg);
+      }
+    });
+
+    it("should insert the mapper provided data layer API Record only once", async () => {
       // arrange
       const initialRecordCount = (await allAPIRecords(dynamodbClient))?.length;
 
-      const dataBoundary = {
+      const dataLayerObj = {
         id: _faker.datatype.uuid(),
         name: _faker.random.words(3),
         baseUrl: { staging: _faker.internet.url() },
       };
 
+      mockMapper.domainToData.mockReturnValue(dataLayerObj);
+
       // act
-      await classUnderTest.executePost(dataBoundary);
+      await classUnderTest.executePost({});
 
       // assert
       const allItems = await allAPIRecords(dynamodbClient);
       const endItemCount = allItems?.length;
-      const insertedItem = filterInsertedRecord(allItems, dataBoundary.id);
+      const insertedItem = filterInsertedRecord(allItems, dataLayerObj.id);
 
       expect(endItemCount).toEqual(initialRecordCount + 1);
-      expect(insertedItem).toStrictEqual(dataBoundary);
+      expect(insertedItem).toStrictEqual(dataLayerObj);
     });
 
     it("should throw a DynamoDB Exception when Error from within dynamodb client comes up", async () => {
@@ -101,11 +138,28 @@ describe("API Records Gateway", () => {
   });
 
   describe("Execute Get method", () => {
-    it("should retrieve a record with a matching id when it exists", async () => {
+    it("should call the mapper's toDataGet method with domainBoundary once", async () => {
+      // arrange
+      const domainBoundary = { id: _faker.datatype.string(5) };
+
+      // act
+      try {
+        await classUnderTest.executeGet(domainBoundary);
+      } catch {
+        // assert
+        expect(mockMapper.toDataGet).toHaveBeenCalledTimes(1);
+        expect(mockMapper.toDataGet).toHaveBeenCalledWith(domainBoundary);
+      }
+    });
+
+    it("should retrieve a record (when record exists) with id coming from toDataGet mapper method", async () => {
       // arrange
       const searchDataBoundary = {
         id: _faker.datatype.string(8),
       };
+
+      mockMapper.toDataGet.mockReturnValue(searchDataBoundary);
+      mockMapper.toDomainGet.mockImplementation((x) => x);
 
       const expectedItem = {
         id: searchDataBoundary.id,
@@ -120,7 +174,7 @@ describe("API Records Gateway", () => {
         .promise();
 
       // act
-      const actualResult = await classUnderTest.executeGet(searchDataBoundary);
+      const actualResult = await classUnderTest.executeGet({});
 
       // assert
       expect(actualResult).toStrictEqual(expectedItem);
@@ -131,6 +185,8 @@ describe("API Records Gateway", () => {
       const searchDataBoundary = {
         id: _faker.datatype.string(8),
       };
+
+      mockMapper.toDataGet.mockReturnValue(searchDataBoundary);
 
       const nonMatchingItem = {
         id: _faker.datatype.string(8),
@@ -153,6 +209,57 @@ describe("API Records Gateway", () => {
 
       // assert
       await expect(testDelegate).rejects.toThrow(expectedException.message);
+    });
+
+    it("should call the mapper's toDomainGet method with dataBoundary returned by the dynamo query once", async () => {
+      // arrange
+      const expectedDbRecord = {
+        id: _faker.datatype.string(8),
+        name: _faker.datatype.string(5),
+      };
+
+      const searchDataBoundary = {
+        id: expectedDbRecord.id,
+      };
+
+      mockMapper.toDataGet.mockReturnValue(searchDataBoundary);
+
+      // make db return the expected db record
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: expectedDbRecord,
+        })
+        .promise();
+
+      // act
+      await classUnderTest.executeGet({});
+
+      // assert
+      expect(mockMapper.toDomainGet).toHaveBeenCalledTimes(1);
+      expect(mockMapper.toDomainGet).toHaveBeenCalledWith(expectedDbRecord);
+    });
+
+    it("should return the domainBoundary outputed by the toDomainGet mapper's method.", async () => {
+      // arrange
+      const expectedResult = generateAPIRecord();
+      await dynamodbClient
+        .put({
+          TableName: process.env.DYNAMODB_APIS_TABLE,
+          Item: expectedResult,
+        })
+        .promise();
+
+      mockMapper.toDataGet.mockReturnValue({
+        id: expectedResult.id,
+      });
+      mockMapper.toDomainGet.mockReturnValue(expectedResult);
+
+      // act
+      const actualResult = await classUnderTest.executeGet({});
+
+      // assert
+      expect(actualResult).toBe(expectedResult);
     });
   });
 });

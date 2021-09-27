@@ -21,16 +21,13 @@ describe("API Records Use Case", () => {
       toDataGet: jest.fn(),
       toDomainGet: jest.fn(),
     };
-    classUnderTest = new APIRecordUseCase(mockGateway, mockMapper);
+    classUnderTest = new APIRecordUseCase(mockGateway);
   });
 
   afterEach(() => {
     mockGateway.executePost.mockReset();
     mockGateway.existsCheck.mockReset();
     mockGateway.executeGet.mockReset();
-    mockMapper.domainToData.mockReset();
-    mockMapper.toDataGet.mockReset();
-    mockMapper.toDomainGet.mockReset();
   });
 
   describe("Execute Post method", () => {
@@ -45,49 +42,21 @@ describe("API Records Use Case", () => {
       expect(mockGateway.executePost).toHaveBeenCalledTimes(1);
     });
 
-    it("should call the domainToData mapper method once", async () => {
+    it("should call the gateway Post method with domain layer object", async () => {
       // arrange
-      mockGateway.existsCheck.mockResolvedValue(false);
-
-      // act
-      await classUnderTest.executePost({});
-
-      // assert
-      expect(mockMapper.domainToData).toHaveBeenCalledTimes(1);
-    });
-
-    it("should call the domainToData mapper method with the argument provided to UC", async () => {
-      // arrange
-      const usecaseArg = {
-        name: _faker.random.words(3),
-        baseUrl: _faker.internet.url(),
-      };
-
-      mockGateway.existsCheck.mockResolvedValue(false);
-
-      // act
-      await classUnderTest.executePost(usecaseArg);
-
-      // assert
-      expect(mockMapper.domainToData).toHaveBeenCalledWith(usecaseArg);
-    });
-
-    it("should call the gateway Post method with data layer object", async () => {
-      // arrange
-      const dataLayerObj = {
+      const domainLayerObj = {
         id: _faker.datatype.uuid(),
         name: _faker.random.words(3),
         baseUrl: _faker.internet.url(),
       };
 
       mockGateway.existsCheck.mockResolvedValue(false);
-      mockMapper.domainToData.mockReturnValue(dataLayerObj);
 
       // act
-      await classUnderTest.executePost({});
+      await classUnderTest.executePost(domainLayerObj);
 
       // assert
-      expect(mockGateway.executePost).toHaveBeenCalledWith(dataLayerObj);
+      expect(mockGateway.executePost).toHaveBeenCalledWith(domainLayerObj);
     });
 
     it("should call the gateway existsCheck method once", async () => {
@@ -129,7 +98,7 @@ describe("API Records Use Case", () => {
       await expect(testDelegate).rejects.toThrow(expectedException.message);
     });
 
-    it("should call neither mapper, nor usecase when API Record already exists", async () => {
+    it("should not call usecase when API Record already exists", async () => {
       // arrange
       const githubId = _faker.datatype.number(10 ** 9, 10 ** 10 - 1);
 
@@ -140,7 +109,6 @@ describe("API Records Use Case", () => {
         await classUnderTest.executePost({ githubId });
       } catch {
         // assert
-        expect(mockMapper.domainToData).not.toHaveBeenCalled();
         expect(mockGateway.executePost).not.toHaveBeenCalled();
       }
     });
@@ -155,20 +123,7 @@ describe("API Records Use Case", () => {
       expect(mockGateway.executeGet).toHaveBeenCalledTimes(1);
     });
 
-    it("should call the gateway's executeGet method with mapper's output", async () => {
-      // arrange
-      const domainBoundary = { id: _faker.datatype.string(5) };
-
-      mockMapper.toDataGet.mockReturnValue(domainBoundary);
-
-      // act
-      await classUnderTest.executeGet({});
-
-      // assert
-      expect(mockGateway.executeGet).toHaveBeenCalledWith(domainBoundary);
-    });
-
-    it("should call the mapper's toDataGet method with domainBoundary once", async () => {
+    it("should call the gateway's executeGet method with domain layer object", async () => {
       // arrange
       const domainBoundary = { id: _faker.datatype.string(5) };
 
@@ -176,33 +131,20 @@ describe("API Records Use Case", () => {
       await classUnderTest.executeGet(domainBoundary);
 
       // assert
-      expect(mockMapper.toDataGet).toHaveBeenCalledTimes(1);
-      expect(mockMapper.toDataGet).toHaveBeenCalledWith(domainBoundary);
+      expect(mockGateway.executeGet).toHaveBeenCalledWith(domainBoundary);
     });
 
-    it("should call the mapper's toDomainGet method with dataBoundary returned by the gateway once", async () => {
+    it("should return the domainBoundary outputed by the gateway's executeGet method.", async () => {
       // arrange
-      const gatewayResponse = generateAPIRecord();
+      const expectedResult = generateAPIRecord();
 
-      mockGateway.executeGet.mockReturnValue(gatewayResponse);
+      mockGateway.executeGet.mockResolvedValue(expectedResult);
+
       // act
-      await classUnderTest.executeGet({});
-
-      // assert
-      expect(mockMapper.toDomainGet).toHaveBeenCalledTimes(1);
-      expect(mockMapper.toDomainGet).toHaveBeenCalledWith(gatewayResponse);
-    });
-
-    it("should return the domainBoundary outputed by the toDomainGet mapper's method.", async () => {
-      // arrange
-      const expectedResult = generateAPIRecord(); // simplistic case, so same structure accross layers
-
-      mockMapper.toDomainGet.mockReturnValue(expectedResult);
-      // act
-      const actualResult = await classUnderTest.executeGet({});
-
-      // assert
-      expect(actualResult).toBe(expectedResult);
+      classUnderTest.executeGet({}).then((actualResult) => {
+        // assert
+        expect(actualResult).toBe(expectedResult);
+      });
     });
   });
 });

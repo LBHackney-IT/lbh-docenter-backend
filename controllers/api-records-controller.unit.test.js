@@ -1,13 +1,11 @@
-const {
-  APIRecordsController,
-} = require("./controllers/api-records-controller");
+const { APIRecordsController } = require("./api-records-controller");
 const {
   DuplicateRecordException,
-} = require("./models/exceptions/duplicateRecordException");
+} = require("../models/exceptions/duplicateRecordException");
 const {
   RecordNotFoundException,
-} = require("./models/exceptions/recordNotFoundException");
-const { DynamoDBException } = require("./models/exceptions/dynamoException");
+} = require("../models/exceptions/recordNotFoundException");
+const { DynamoDBException } = require("../models/exceptions/dynamoException");
 const _faker = require("faker");
 const randexp = require("randexp").randexp;
 
@@ -36,10 +34,10 @@ describe("API Records Controller", () => {
   });
 
   describe("Base endpoint method", () => {
-    xit("should return a function that accepts & passes AWS API gateway's event and context objects into custom implementation", async () => {
+    it("should return a function that accepts & passes AWS API gateway's event and context objects into custom implementation", async () => {
       // arrange
       const event = {
-        body: { inputProp: _faker.datatype.number() },
+        body: JSON.stringify({ inputProp: _faker.datatype.number() }),
         pathParameters: { duckId: _faker.datatype.number() },
       };
       const context = { someContextProp: _faker.random.word() };
@@ -59,14 +57,14 @@ describe("API Records Controller", () => {
       expect(customImplementation).toHaveBeenCalledWith(event, context);
     });
 
-    xit("should return a function that passes AWS API gateway's event's pathParameters and body fields combined into a single object to each validator", async () => {
+    it("should return a function that passes AWS API gateway's event's pathParameters and body fields combined into a single object to each validator", async () => {
       // arrange
       const event = {
         testProp: _faker.random.word(),
-        body: {
+        body: JSON.stringify({
           inputProp1: _faker.datatype.number(),
           inputProp2: _faker.random.word(),
-        },
+        }),
         pathParameters: {
           duckId: _faker.datatype.number(),
         },
@@ -86,7 +84,10 @@ describe("API Records Controller", () => {
         implementation: () => {},
       });
 
-      const combinedInputsObj = { ...event.pathParameters, ...event.body };
+      const combinedInputsObj = {
+        ...event.pathParameters,
+        ...JSON.parse(event.body),
+      };
 
       // act
       await endpoint(event, context);
@@ -98,9 +99,9 @@ describe("API Records Controller", () => {
       });
     });
 
-    xit("should return a function that returns validators' returned validation errors in a custom 400 bad input response", async () => {
+    it("should return a function that returns validators' returned validation errors in a custom 400 bad input response", async () => {
       // arrange
-      const event = { pathParameters: "", body: "" };
+      const event = { pathParameters: "", body: null };
       const context = {};
 
       const mockValidators = [...new Array(3).keys()].map((num) => {
@@ -112,11 +113,11 @@ describe("API Records Controller", () => {
 
       const expectedResponse = {
         statusCode: 400,
-        body: {
+        body: JSON.stringify({
           validationErrors: mockValidators
             .filter((_, i) => i % 2 === 0)
             .map((v) => v.failureMessage),
-        },
+        }),
       };
 
       const endpoint = classUnderTest.baseEndpoint({
@@ -160,9 +161,9 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
-    xit("should return a function that handles DuplicateRecordException failure within implementation by returning a 409 Conflict response", async () => {
+    it("should return a function that handles DuplicateRecordException failure within implementation by returning a 409 Conflict response", async () => {
       // arrange
-      const event = { pathParameters: "", body: "" };
+      const event = { pathParameters: "", body: null };
       const context = {};
 
       const expectedErrorMessage = `The project from this repository (githubId: ${_faker.datatype.number()}) already exists!`;
@@ -176,10 +177,10 @@ describe("API Records Controller", () => {
 
       const expectedResponse = {
         statusCode: 409,
-        body: {
+        body: JSON.stringify({
           userMessage: expectedErrorMessage,
           errorMessage: expectedErrorMessage,
-        },
+        }),
       };
 
       // act
@@ -189,9 +190,9 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
-    xit("should return a function that handles Any type of error from within implementation function by returning a 500 Internal Server Error response", async () => {
+    it("should return a function that handles Any type of error from within implementation function by returning a 500 Internal Server Error response", async () => {
       // arrange
-      const event = { pathParameters: "", body: "" };
+      const event = { pathParameters: "", body: null };
       const context = {};
 
       const expectedErrorMessage = _faker.random.words(3);
@@ -205,10 +206,10 @@ describe("API Records Controller", () => {
 
       const expectedResponse = {
         statusCode: 500,
-        body: {
+        body: JSON.stringify({
           userMessage: "Unexpected server error.",
           errorMessage: expectedErrorMessage,
-        },
+        }),
       };
 
       // act
@@ -218,9 +219,9 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
-    xit("should return a function that handles DynamoDB failure within implementation by returning a 503 Service Unavailable response", async () => {
+    it("should return a function that handles DynamoDB failure within implementation by returning a 503 Service Unavailable response", async () => {
       // arrange
-      const event = { pathParameters: "", body: "" };
+      const event = { pathParameters: "", body: null };
       const context = {};
 
       const expectedErrorMessage = _faker.random.words(3);
@@ -234,10 +235,10 @@ describe("API Records Controller", () => {
 
       const expectedResponse = {
         statusCode: 503,
-        body: {
+        body: JSON.stringify({
           userMessage: "Dynamo client error. Please try again later.",
           errorMessage: expectedErrorMessage,
-        },
+        }),
       };
 
       // act
@@ -247,19 +248,19 @@ describe("API Records Controller", () => {
       expect(endpointResponse).toStrictEqual(expectedResponse);
     });
 
-    xit("should return a function that upon successful code execution forwards the server response from implementation back to API Gateway", async () => {
+    it("should return a function that upon successful code execution forwards the server response from implementation back to API Gateway", async () => {
       // arrange
-      const event = { pathParameters: "", body: "" };
+      const event = { pathParameters: "", body: null };
       const context = {};
 
       const expectedResponse = {
         statusCode: 200,
-        body: {
+        body: JSON.stringify({
           data: {
             prop1: "Heart of the Cards, guide me! I draw!",
             prop2: 40,
           },
-        },
+        }),
       };
 
       const endpoint = classUnderTest.baseEndpoint({
@@ -275,23 +276,23 @@ describe("API Records Controller", () => {
     });
   });
 
-  xdescribe("Create method", () => {
+  describe("Create method", () => {
     // TODO: don't test all of them at once!
     it("should return a function that performs validation on user input to check whether the required fields are non-empty", async () => {
       // arrange
-      const event = {};
+      const event = { body: null };
       const context = {};
 
       const expectedResponse = {
         statusCode: 400,
-        body: {
+        body: JSON.stringify({
           validationErrors: [
             "Please provide a non-empty API name.",
             "Please provide a non-empy GithubId number.",
             "Please provide a valid and non-empty API's url base.",
             "Please provide a valid and non-empty Github url.",
           ],
-        },
+        }),
       };
 
       const endpoint = classUnderTest.create();
@@ -306,22 +307,22 @@ describe("API Records Controller", () => {
     it("should return a function that performs validation checking whether GithubId is a number", async () => {
       // arrange
       const event = {
-        body: {
+        body: JSON.stringify({
           name: _faker.random.word(3),
           githubId: _faker.datatype.number(10 ** 9, 10 ** 10 - 1).toString(),
           baseUrl: {
             [randexp(/development|staging|production/)]: _faker.internet.url(),
           },
           githubUrl: _faker.internet.url(),
-        },
+        }),
       };
       const context = {};
 
       const expectedResponse = {
         statusCode: 400,
-        body: {
+        body: JSON.stringify({
           validationErrors: ["Please provide a non-empy GithubId number."],
-        },
+        }),
       };
 
       const endpoint = classUnderTest.create();
@@ -336,12 +337,12 @@ describe("API Records Controller", () => {
     it("should return a function that calls the presentation to domain mapper with the input event body", async () => {
       // arrange
       const event = {
-        body: {
+        body: JSON.stringify({
           name: _faker.random.word(3),
           githubId: _faker.datatype.number(),
           baseUrl: { staging: _faker.internet.url() },
           githubUrl: _faker.internet.url(),
-        },
+        }),
       };
       const context = {};
 
@@ -358,12 +359,12 @@ describe("API Records Controller", () => {
     it("should return a function that calls the use case with the the output of presentation to domain mapper", async () => {
       // arrange
       const event = {
-        body: {
+        body: JSON.stringify({
           name: _faker.random.word(3),
           githubId: _faker.datatype.number(),
           baseUrl: { staging: _faker.internet.url() },
           githubUrl: _faker.internet.url(),
-        },
+        }),
       };
       const context = {};
       const dummyMapperResponse = {
@@ -386,12 +387,12 @@ describe("API Records Controller", () => {
     it("should retuned a function that returns 201 Created upon successful, error-free execution.", async () => {
       // arrange
       const event = {
-        body: {
+        body: JSON.stringify({
           name: _faker.random.word(3),
           githubId: _faker.datatype.number(),
           baseUrl: { staging: _faker.internet.url() },
           githubUrl: _faker.internet.url(),
-        },
+        }),
       };
       const context = {};
 
