@@ -51,7 +51,15 @@ commands:
           command: sudo npm i -g serverless
       - run:
           name: Deploy lambda
-          command: sudo yarn --frozen-lockfile && sls deploy --stage staging
+          command: sudo yarn --frozen-lockfile && \
+                   script -q --flush --return ./backDeployOutput.txt -c "sls deploy --stage staging" && \
+                   grep -oP -m 1 'https://[\w.\-*]+?amazonaws\.com/(development|staging|production|devscratch)' ./backDeployOutput.txt > baseURL.txt
+      - run:
+          name: Check file
+          command: ls
+      - run:
+          name: inspect file
+          command: cat ./baseURL.txt
 jobs:
   build-and-test:
     executor: nodeenv
@@ -92,12 +100,6 @@ workflows:
           context: api-assume-role-staging-context
           requires:
             - build-and-test
-          filters:
-            branches:
-              only: master
       - deploy-to-staging:
           requires:
             - assume-role-staging
-          filters:
-            branches:
-              only: master
