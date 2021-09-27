@@ -34,6 +34,10 @@ describe("API Records Controller", () => {
   });
 
   describe("Base endpoint method", () => {
+    /* TODO: Add test for baseEndpoint parsing event.body
+         from typeof string to typeof object
+         should equal to self deparsed */
+
     it("should return a function that accepts & passes AWS API gateway's event and context objects into custom implementation", async () => {
       // arrange
       const event = {

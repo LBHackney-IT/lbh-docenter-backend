@@ -15,45 +15,27 @@ class APIRecordsController {
 
   baseEndpoint({ validators, implementation }) {
     return async (event, context) => {
-      /* TODO: consider string body
-         Adjust the tests to work with body as a string!
-         Add test for baseEndpoint parsing event.body
-         from typeof string to typeof object
-         should equal to self deparsed /*
-
-      /*
-TODO: test this case when body is null
-SyntaxError: Unexpected token u in JSON at position 0
-        at JSON.parse (<anonymous>)
-
-      17 |       // from typeof string to typeof object
-      18 |       // should equal to self deparsed
-    > 19 |       const payload = JSON.parse(event.body);
-      */
       const payload = JSON.parse(event.body);
       event.body = payload;
+
       const validationErrors = validators
         ?.filter(
-          (rule) =>
-            !rule.validate({
-              ...event.pathParameters,
-              ...payload,
-            })
+          (rule) => !rule.validate({ ...event.pathParameters, ...payload })
         )
         .map((rule) => rule.failureMessage);
 
       if (validationErrors?.length > 0)
         return {
           statusCode: 400,
-          body: JSON.stringify({
-            validationErrors,
-          }),
+          body: JSON.stringify({ validationErrors }),
         };
 
       try {
-        return await implementation(event, context);
+        const controllerResponse = await implementation(event, context);
+        if (controllerResponse.body)
+          controllerResponse.body = JSON.stringify(controllerResponse.body);
+        return controllerResponse;
       } catch (e) {
-        // should probs turn it into switch case at some point
         if (e instanceof RecordNotFoundException) {
           return {
             statusCode: 404,
@@ -155,7 +137,7 @@ SyntaxError: Unexpected token u in JSON at position 0
           await this._apiRecordsPDMapper.domainToPresentationGet(usecaseResult);
         return {
           statusCode: 200,
-          body: JSON.stringify(presentationBoundary),
+          body: presentationBoundary,
         };
       },
     });
@@ -175,7 +157,7 @@ SyntaxError: Unexpected token u in JSON at position 0
         });
         return {
           statusCode: 200,
-          body: JSON.stringify(apisList),
+          body: apisList,
         };
       },
     });
