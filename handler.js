@@ -49,9 +49,7 @@ module.exports = {
   },
   // TODO Fix record creation error, where only 3 fields get added to the DB in gateway
   createAPI: controller.create(),
-  listAPIs: async (event, context) => {
-    return { statusCode: 501 };
-  },
+  listAPIs: controller.listAPIs(),
   getAPI: controller.get(),
   patchAPI: async (event, context) => {
     return { statusCode: 501 };

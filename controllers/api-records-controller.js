@@ -15,10 +15,11 @@ class APIRecordsController {
 
   baseEndpoint({ validators, implementation }) {
     return async (event, context) => {
-      // TODO: Adjust the tests to work with body as a string!
-      // Add test for baseEndpoint parsing event.body
-      // from typeof string to typeof object
-      // should equal to self deparsed
+      /* TODO: consider string body
+         Adjust the tests to work with body as a string!
+         Add test for baseEndpoint parsing event.body
+         from typeof string to typeof object
+         should equal to self deparsed /*
 
       /*
 TODO: test this case when body is null
@@ -156,6 +157,22 @@ SyntaxError: Unexpected token u in JSON at position 0
           statusCode: 200,
           body: JSON.stringify(presentationBoundary),
         };
+      },
+    });
+  }
+
+  listAPIs() {
+    return this.baseEndpoint({
+      validators: [],
+      implementation: async (event, context) => {
+        const usecaseResult = await this._apiRecordUseCase.executeList();
+        return usecaseResult.map((r) => {
+          return {
+            id: r.id,
+            githubId: r.githubId,
+            name: r.name,
+          };
+        });
       },
     });
   }

@@ -61,6 +61,16 @@ class APIRecordsGateway {
 
     return apiRecord.Item;
   }
+
+  async executeList() {
+    const apiRecords = await dynamoClient
+      .scan({
+        TableName: TABLE_NAME,
+      })
+      .promise();
+
+    return apiRecords.Items || [];
+  }
 }
 
 module.exports = {

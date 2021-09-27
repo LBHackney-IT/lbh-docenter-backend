@@ -25,6 +25,10 @@ class APIRecordUseCase {
     const gatewayResult = await this._apiRecordGateway.executeGet(dataBoundary);
     return await this._domainDataMapper.toDomainGet(gatewayResult);
   }
+
+  async executeList() {
+    return await this._apiRecordGateway.executeList();
+  }
 }
 
 module.exports = {
