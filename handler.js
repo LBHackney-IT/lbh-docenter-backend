@@ -8,7 +8,6 @@ const {
   APIRecordsController,
 } = require("./controllers/api-records-controller");
 
-const gateway = new APIRecordsGateway(dynamodbClient);
 const pdMapper = new PresentationDomainMapper();
 pdMapper["presentationToDomainGet"] = (userInput) => {
   return { id: userInput.id };
@@ -30,7 +29,8 @@ dmMapper["toDomainGet"] = dmMapper["domainToData"];
 // mockMapper.toDataGet.mockReset();
 // mockMapper.toDomainGet.mockReset();
 
-const usecase = new APIRecordUseCase(gateway, dmMapper);
+const gateway = new APIRecordsGateway(dynamodbClient, dmMapper);
+const usecase = new APIRecordUseCase(gateway);
 const controller = new APIRecordsController(usecase, pdMapper);
 
 module.exports = {
@@ -47,7 +47,6 @@ module.exports = {
       ),
     };
   },
-  // TODO Fix record creation error, where only 3 fields get added to the DB in gateway
   createAPI: controller.create(),
   listAPIs: controller.listAPIs(),
   getAPI: controller.get(),

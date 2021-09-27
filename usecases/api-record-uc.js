@@ -3,9 +3,8 @@ const {
 } = require("../models/exceptions/duplicateRecordException");
 
 class APIRecordUseCase {
-  constructor(apiRecordGateway, domainDataMapper) {
+  constructor(apiRecordGateway) {
     this._apiRecordGateway = apiRecordGateway;
-    this._domainDataMapper = domainDataMapper;
   }
 
   async executePost(domainBoundary) {
@@ -16,14 +15,15 @@ class APIRecordUseCase {
       throw new DuplicateRecordException(
         `The project from this repository (githubId: ${domainBoundary?.githubId}) already exists!`
       );
-    const dataBoundary = this._domainDataMapper.domainToData(domainBoundary);
-    await this._apiRecordGateway.executePost(dataBoundary);
+
+    await this._apiRecordGateway.executePost(domainBoundary);
   }
 
   async executeGet(domainBoundary) {
-    const dataBoundary = await this._domainDataMapper.toDataGet(domainBoundary);
-    const gatewayResult = await this._apiRecordGateway.executeGet(dataBoundary);
-    return await this._domainDataMapper.toDomainGet(gatewayResult);
+    const gatewayResult = await this._apiRecordGateway.executeGet(
+      domainBoundary
+    );
+    return gatewayResult;
   }
 
   async executeList() {

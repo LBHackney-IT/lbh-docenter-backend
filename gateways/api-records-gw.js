@@ -4,9 +4,10 @@ const {
 } = require("../models/exceptions/recordNotFoundException");
 
 class APIRecordsGateway {
-  constructor(databaseContext) {
+  constructor(databaseContext, domainDataMapper) {
     this._databaseContext = databaseContext;
     this.executePost = this.executePost.bind(this);
+    this._domainDataMapper = domainDataMapper;
   }
 
   // Check whether a repository is already registered within database
@@ -27,7 +28,8 @@ class APIRecordsGateway {
     return getResult.Items.length > 0;
   }
 
-  async executePost(dataBoundary) {
+  async executePost(domainBoundary) {
+    const dataBoundary = this._domainDataMapper.domainToData(domainBoundary);
     let createParams = {
       TableName: process.env.DYNAMODB_APIS_TABLE,
       // should do parsing elsewhere
@@ -44,7 +46,9 @@ class APIRecordsGateway {
     }
   }
 
-  async executeGet(dataBoundary) {
+  async executeGet(domainBoundary) {
+    const dataBoundary = await this._domainDataMapper.toDataGet(domainBoundary);
+
     const apiRecord = await this._databaseContext
       .get({
         TableName: process.env.DYNAMODB_APIS_TABLE,
@@ -59,13 +63,17 @@ class APIRecordsGateway {
         `Record with id: ${dataBoundary.id} was not found.`
       );
 
-    return apiRecord.Item;
+    const domainRecord = await this._domainDataMapper.toDomainGet(
+      apiRecord.Item
+    );
+
+    return domainRecord;
   }
 
   async executeList() {
-    const apiRecords = await dynamoClient
+    const apiRecords = await this._databaseContext
       .scan({
-        TableName: TABLE_NAME,
+        TableName: process.env.DYNAMODB_APIS_TABLE,
       })
       .promise();
 

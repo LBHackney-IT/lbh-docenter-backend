@@ -1,6 +1,6 @@
 .PHONY: local
 local:
-	serverless offline start --stage local
+	serverless offline start --apiKey any-pregenerated-key --stage local
 
 .PHONY: dynamo
 dynamo:

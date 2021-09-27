@@ -166,13 +166,17 @@ SyntaxError: Unexpected token u in JSON at position 0
       validators: [],
       implementation: async (event, context) => {
         const usecaseResult = await this._apiRecordUseCase.executeList();
-        return usecaseResult.map((r) => {
+        const apisList = usecaseResult.map((r) => {
           return {
             id: r.id,
             githubId: r.githubId,
             name: r.name,
           };
         });
+        return {
+          statusCode: 200,
+          body: JSON.stringify(apisList),
+        };
       },
     });
   }
