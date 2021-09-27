@@ -98,7 +98,6 @@ jobs:
 workflows:
   check-and-deploy-staging:
     jobs:
-#       - build-and-test
       - assume-role-staging:
           context: api-assume-role-staging-context
           requires:
