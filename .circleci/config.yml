@@ -54,8 +54,7 @@ commands:
           command: sudo apt-get update -y && sudo apt-get install -y util-linux
       - run:
           name: Deploy lambda
-          command: sudo yarn --frozen-lockfile && \
-                   script -q --flush --return ./backDeployOutput.txt -c "sls deploy --stage staging" && \
+          command: sudo yarn --frozen-lockfile && script -q --flush --return ./backDeployOutput.txt -c "sls deploy --stage staging" && \
                    grep -oP -m 1 'https://[\w.\-*]+?amazonaws\.com/(development|staging|production|devscratch)' ./backDeployOutput.txt > baseURL.txt
       - run:
           name: Check file
