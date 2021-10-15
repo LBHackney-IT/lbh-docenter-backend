@@ -92,7 +92,7 @@ class APIRecordsController {
             "Please provide a valid and non-empty API's url base.",
           validate: (inputObj) => {
             const baseUrl = inputObj.baseUrl;
-            const environments = !!baseUrl ? Object.keys(baseUrl) : []; //.filter((env) => !!env?.match(/^(development|staging|production)$/));
+            const environments = baseUrl ? Object.keys(baseUrl) : []; //.filter((env) => !!env?.match(/^(development|staging|production)$/));
             return (
               baseUrl &&
               environments

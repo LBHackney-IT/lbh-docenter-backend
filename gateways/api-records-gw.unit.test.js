@@ -91,6 +91,8 @@ describe("API Records Gateway", () => {
         expectedException
       );
 
+      mockMapper.domainToData.mockReturnValue({ id: "asdf" });
+
       // act
       const testDelegate = classUnderTest.executePost;
 
