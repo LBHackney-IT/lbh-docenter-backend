@@ -37,6 +37,7 @@ class PresentationDomainMapper {
     return new Endpoint({
       httpMethod: userInput?.httpMethod,
       name: userInput?.name,
+      path: userInput?.path,
     });
   }
 
@@ -63,6 +64,9 @@ class PresentationDomainMapper {
       technicalName: userInput?.technicalName,
       type: userInput?.type,
       hostedAt: userInput?.hostedAt,
+      endpointsUsingIt: userInput?.endpointsUsingIt?.map((endpoint) =>
+        this.toDomain_Endpoint(endpoint)
+      ),
     });
   }
 
